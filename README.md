@@ -22,3 +22,5 @@ Branches in this repo will be ordered a bit different from most projects because
 - If you wish to contribute to this repo rather than fork, shoot me a message\* and we'll see if I can add you;
   - It's advisable to have sent in PRs before you request being added to the repo.
 
+# Contact #
+You can reach me through the issue system here on github, or through Discord as `@Scuffed Riven#0042`.
