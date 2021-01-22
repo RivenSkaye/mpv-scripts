@@ -20,6 +20,7 @@ A new parser for a type of playlist files should provide at least one function:
 		- The current position in the playlist
 	- The value returned should be a string that can be written to a playlist file, according to the playlist spec.
 	- **Make sure to add it to the module's exported function list**. The parser will be `require`d dynamically so if you don't expose `parser.format_pls`, it can't be used.
+
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, this code is gonna be happy with it.
 
