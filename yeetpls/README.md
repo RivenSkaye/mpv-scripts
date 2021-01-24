@@ -16,8 +16,6 @@ A new parser for a type of playlist files should provide at least one function:
 			- In Lua, this becomes an indexed table of tables:
 			- Top level: `ipair`s of a number and a table to determine the order;
 			- Inner table: `pair`s of Stream Type (string) and the actual URL.
-		- The total amount of entries in the playlist.
-		- The current position in the playlist
 	- The value returned should be a string that can be written to a playlist file, according to the playlist spec.
 	- **Make sure to add it to the module's exported function list**. The parser will be `require`d dynamically so if you don't expose `parser.format_pls`, it can't be used.
 
