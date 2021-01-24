@@ -46,7 +46,7 @@ function base_init()
 	end
 	-- Not sure what happens if I define a new variable and use an existing one,
 	-- better make sure both exist.
-	local hasparser = nil
+	local hasparser = false
 	-- Test if we have a parser for this
 	hasparser,parser = pcall(require, filetype.."-parser")
 	if not hasparser then
