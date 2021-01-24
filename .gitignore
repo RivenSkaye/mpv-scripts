@@ -4,6 +4,7 @@
 .komodotools
 
 ##Lua##
+test.lua
 # Compiled Lua sources #
 luac.out
 # luarocks build files #
