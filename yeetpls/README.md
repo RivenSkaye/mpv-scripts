@@ -25,6 +25,10 @@ A new parser for a type of playlist files should provide at least two functions:
 		- Mention this in any PR to add functionality
 		- Provide a list of all formats that match
 	- Provide an internal way of matching the spec
+	- Try to also match the current file content
+		- Examples include not adding optional fields that the file currently doesn't use
+		- Not dropping fields that could fairly easily be implemented
+		- If a file takes note of URL/local file/webstream, please try to match this in the output
 	- Do not throw errors if a file is a mismatch to the spec
 		- Either use `print` or `mp.msg.warn` to notify the user of this.
 		- Optionally print a single line message on the OSD
