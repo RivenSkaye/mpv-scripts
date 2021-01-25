@@ -6,6 +6,29 @@ If this doesn't work, it notifies the user with an `error` message and exits.
 
 This script does not care about where it's being run from. So long as mpv can resolve the file names from the playlist, it's assumed this script can as well with no extra info
 
+## Usage Notes ##
+This script assumes that **there is no shuffle applied**. It was made with the intention of automating the entire process from acquiring anime down to watching the show without doing anything
+other than pointing mpv to a playlist. I personally set up a simple script to run on download completion that automatically generates a file `playlist.txt` which is just a list of file names
+in the directory that don't match certain patterns.
+
+If you apply shuffle, make sure that the playlist format you use gets processed by a parser that actually filters the entries by comparison. The `txt` parser is guaranteed to provide
+this functionality, because the file format is extremely easy to use and the largest workload is extracting all remaining file names. Creating a playlist for it is as easy as redirecting
+the output of `ls` (or `dir` with the correct flags under Windows) to a text file, or just aggregating all full paths for the media you want in it in a single file.
+
+~~the `txt` parser is also the only one guaranteed to actually exist. I'm lazy and if it works for _me_, I'm usually happy~~
+
+## Known issues ##
+Currently, due to a limitation of mpv, the script is unable to fetch the playlist file provided with the `--playlist` command line option. Because it's not good practice to gamble on how
+a playlist file gets provided, the script currently requires a user to set a script-opt instead. The easiest way is to alias something that includes the script-opt if your playlists are generated with
+static file names, or to set it in a config file. The script-opt to be set is `yeetpls-playlist`,
+as per the standard outlined on mpv.io to automatically look for any script-opt named {script_name}-{opt_name}.
+
+Yes, this means specifying the file twice. Don't complain to me about this, go to the mpv repository. I already sent in a [feature request](https://github.com/mpv-player/mpv/issues/8508)
+to fix this, including all information I could get my hands on in regards to getting the playlist files. Someone suggested a possible fix on init time, but it doesn't work with the `--playlist` option.
+Feel free to suggest other ways of attempting to get the file though!
+_Behavior for this problem might change to instead attempt to load the playlist from just the script-opt and having the user add the flag to not close on idling. This remains to be seen as it changes
+the requirements to parsers as well, to read playlists on start and parse them to a table instead of just the other way around. Imagine the extra effort this would take_
+
 ## Parsers ##
 A new parser for a type of playlist files should provide at least two functions:
 - `format_pls`:
@@ -33,16 +56,7 @@ A new parser for a type of playlist files should provide at least two functions:
 		- Either use `print` or `mp.msg.warn` to notify the user of this.
 		- Optionally print a single line message on the OSD
 		- `return false` makes main.lua attempt to use a fallback, if that fails it provides a clean exit.
+	- This requirement might be dropped, as it would require testing for optional fields in several formats.
 
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, this code is gonna be happy with it.
-
-## Notes ##
-This script assumes that **there is no shuffle applied**. It was made with the intention of automating the entire process from acquiring anime down to watching the show without doing anything
-other than pointing mpv to a playlist. I personally set up a simple script to run on download completion that automatically generates a file `playlist.txt` which is just a list of file names
-in the directory that don't match certain patterns.
-
-If you apply shuffle, make sure that the playlist format you use gets processed by a parser that actually filters the entries by comparison. The `txt` parser is guaranteed to provide
-this functionality, because the file format is extremely easy to use and the largest workload is extracting all remaining file names.
-
-~~the `txt` parser is also the only one guaranteed to actually exist. I'm lazy and if it works for _me_, I'm usually happy~~
