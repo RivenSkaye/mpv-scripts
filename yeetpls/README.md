@@ -7,7 +7,7 @@ If this doesn't work, it notifies the user with an `error` message and exits.
 This script does not care about where it's being run from. So long as mpv can resolve the file names from the playlist, it's assumed this script can as well with no extra info
 
 ## Parsers ##
-A new parser for a type of playlist files should provide at least one function:
+A new parser for a type of playlist files should provide at least two functions:
 - `format_pls`:
 	- Arguments given to a parser are always the same, in the given order:
 		- The playlist as read from the file, as a string.
@@ -18,6 +18,17 @@ A new parser for a type of playlist files should provide at least one function:
 			- Inner table: `pair`s of Stream Type (string) and the actual URL.
 	- The value returned should be a string that can be written to a playlist file, according to the playlist spec.
 	- **Make sure to add it to the module's exported function list**. The parser will be `require`d dynamically so if you don't expose `parser.format_pls`, it can't be used.
+- `test_format`:
+	- Argument given for this function is always just the content of the file.
+	- The value returned should be a boolean
+	- If multiple format specs allow for the same parser to be used (m3u/m3u8 for example), an extra step is required:
+		- Mention this in any PR to add functionality
+		- Provide a list of all formats that match
+	- Provide an internal way of matching the spec
+	- Do not throw errors if a file is a mismatch to the spec
+		- Either use `print` or `mp.msg.warn` to notify the user of this.
+		- Optionally print a single line message on the OSD
+		- `return false` makes main.lua attempt to use a fallback, if that fails it provides a clean exit.
 
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, this code is gonna be happy with it.
