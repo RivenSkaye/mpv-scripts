@@ -19,7 +19,8 @@ local full_winpath = "(%a:\\)?(([\w,\s;-]+(%.+)?)+\\)*([\w,\s;\.-]+(\.(%a+))?$)"
 -- Uses forward slashes instead of >Windows backslashes
 -- Allows escaped whitespace. Most often encountered on files made on a Windows
 -- 		machine, or mounted NTFS drives. Dual boot system pain
-local full_path = "/(([\w-]+(\\\s)*(%.+)?)+/)*([\w\.-]+(\\\s)*(\.(%a+))?$)"
+-- 		Escaping whitespace might not be necessry for applications.
+local full_path = "/(([\w-]+((\\)?\s)*(%.+)?)+/)*([\w\.-]+((\\)?\s)*(\.(%a+))?$)"
 local mpv_tbl
 
 -- Check if a value is a playlist entry. v[1] is "filename" or similar, v[2] is the entry
