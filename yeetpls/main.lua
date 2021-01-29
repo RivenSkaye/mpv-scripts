@@ -108,15 +108,15 @@ if options.make_config then
 		config_file = config_file:gsub("/", "\\")
 	end
 	local file,err,errcode = io.open(config_file, "w+")
-	if not err then
-		msg.error("Couldn't create config file, recieved error "..errcode..": "..err)
+	if err then
+		msg.error("Couldn't create config file, recieved error "..tostring(errcode)..": "..tostring(err))
 		msg.info("To prevent getting this message again, make sure the script can write to '"..config_file.."' or create a default config file for yeetpls that sets make_config=false")
 	else
 		msg.info("Setting all defaults for the script settings. Using current settings from --script-ops except for make_config, playlist_type and playlist")
 		file:write("# Config file for the yeetpls Lua script. All options are followed by a comment listing all legal values, the default for the script is indicated with *\n\n")
 		file:write("# Whether or not to (re)create the default config file\nmake_config=false # [true | *false]\n\n")
-		file:write("# Whether or not to delete entries in the playlist file, makes VERY little sense to turn off\nauto_delete_entries="..options.auto_delete_entries.." # [*true | false]\n\n")
-		file:write("# Whether or not to delete the playlist file after finishing the last file\nauto_delete_file="..options.auto_delete_files.." # [*true | false]")
+		file:write("# Whether or not to delete entries in the playlist file, makes VERY little sense to turn off\nauto_delete_entries="..tostring(options.auto_delete_entries).." # [*true | false]\n\n")
+		file:write("# Whether or not to delete the playlist file after finishing the last file\nauto_delete_file="..tostring(options.auto_delete_files).." # [*true | false]")
 		file:write("# The type of playlist, and by extension what parser, to use. The script can figure this out during runtime.\nplaylist_type=auto # [*auto | txt | ...] make sure this matches one of the *-parser.lua files exactly!")
 		file:write("# Playlist file to load. Setting this here can cause some issues, so be careful!\nplaylist=None # [None | any file path or name you want]")
 		file:write("# Whether or not to create the playlist file if it doesn't already exist. Some edge cases can cause issues.\ncreate_file=false\n\n")
