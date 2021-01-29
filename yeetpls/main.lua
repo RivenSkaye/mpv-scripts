@@ -7,17 +7,13 @@ local parser = nil -- The parser used internally, set during init.
 local parser_name = nil -- This value is only used when stuff errors
 local pls_old = nil -- The old playlist file's content
 local mpv_pls = nil -- populated internally with mpv's playlist
-local pls_deleted = false -- prevents shutdown from eof before writing to file
+local script_dir = nil
 local options = {
+	make_config = true,
 	-- whether or not to auto-delete playlist entries after playing them
 	auto_delete_entries = true, -- (*true | false)
 	-- Whether to delete the playlist file if the last file is played
 	auto_delete_file = true, -- (*true | false)
-	-- Print info like playlist length and title when starting
-	info_on_start = true, -- (*true | false)
-	-- Print info like remaining titles and title on the next entry
-	info_on_next = false, -- (true | *false)
-
 	-- The type of playlist, used for processing defaults internally. Default is "auto" and makes the script check it
 	-- This list of filetypes is arbitrary and "auto" will allow for parsing anything that has a parser script available
 	playlist_type = "auto", -- ("txt" | *"auto" | the name of any of the existing parsers)
@@ -25,7 +21,12 @@ local options = {
 	-- This playlist is parsed internally and only parses playlist types for which a parser is available.
 	playlist = "None", -- ("None" | "[/path/to/]<playlist_file.ext>")
 	-- Whether to create the playlist file if it doesn't exist yet
-	create_file = false -- (true | *false)
+	create_file = false, -- (true | *false)
+	-- Emergency exit option. The only use-case is when people set up a config file for this script
+	-- that sets a default playlist file to load and either
+	-- create_file=true or has mpv running with --idle=[once | yes]
+	-- or if the playlist file already exists and is set in the config
+	exit = false
 }
 opts.read_options(options, "yeetpls")
 
@@ -88,24 +89,48 @@ function base_init()
 	return true
 end
 
-if options.playlist == "None" then
-	msg.error("No playlist given to the --script-opts=yeetpls-playlist=<playlist file> switch. Exiting extension...")
+if options.playlist == "None" or options.exit then -- silently exit
 	return
 else
 	if not base_init() then -- something caused a failure, exit.
 		msg.error(parser_name.." was unable to parse this playlist type ("..filetype.."). Exiting...")
 		return
-	else
-	if #mpv_pls == 0 then
+	elseif #mpv_pls == 0 then
 		mp.commandv('loadlist', options.playlist, 'append')
 	end
 end
+-- If and only if we're successful, create the config file if it doesn't exist yet
+-- If the script is global and the user wants their own custom config, they can do it themselves
+if options.make_config then
+	-- create the config file and alert the user
+	local config_file = mp.get_script_directory():gsub("scripts[/|\\].*", "script-ops/yeetpls.conf")
+	if mp.get_property_native('options/vo-mmcss-profile', o) ~= o then
+		config_file = config_file:gsub("/", "\\")
+	end
+	local file,err,errcode = io.open(config_file, "w+")
+	if not err then
+		msg.error("Couldn't create config file, recieved error "..errcode..": "..err)
+		msg.info("To prevent getting this message again, make sure the script can write to '"..config_file.."' or create a default config file for yeetpls that sets make_config=false")
+	else
+		msg.info("Setting all defaults for the script settings. Using current settings from --script-ops except for make_config, playlist_type and playlist")
+		file:write("# Config file for the yeetpls Lua script. All options are followed by a comment listing all legal values, the default for the script is indicated with *\n\n")
+		file:write("# Whether or not to (re)create the default config file\nmake_config=false # [true | *false]\n\n")
+		file:write("# Whether or not to delete entries in the playlist file, makes VERY little sense to turn off\nauto_delete_entries="..options.auto_delete_entries.." # [*true | false]\n\n")
+		file:write("# Whether or not to delete the playlist file after finishing the last file\nauto_delete_file="..options.auto_delete_files.." # [*true | false]")
+		file:write("# The type of playlist, and by extension what parser, to use. The script can figure this out during runtime.\nplaylist_type=auto # [*auto | txt | ...] make sure this matches one of the *-parser.lua files exactly!")
+		file:write("# Playlist file to load. Setting this here can cause some issues, so be careful!\nplaylist=None # [None | any file path or name you want]")
+		file:write("# Whether or not to create the playlist file if it doesn't already exist. Some edge cases can cause issues.\ncreate_file=false\n\n")
+		file:write("# Emergency option to exit the script without doing anything. THIS SHOULD ONLY BE SET TO TRUE THROUGH --SCRIPT-OPS. Disables the script entirely!\nexit=false\n")
+		-- Files should end with a blank line, this is common sense.
+	end
+end
 
+local pls_deleted = false -- prevents shutdown from eof before writing to file
 function pls_remove(event)
 	-- If a user quits midway through, don't delete the entry.
 	-- Skipping to next should have another reason according to docs
 	-- Error is an external issue, better not remove the entry so the user can debug
-	if event.reason == "quit" or event.reason == "error" then
+	if event.reason == "quit" or event.reason == "error" or not options.auto_delete_entries then
 		return
 	end
 	-- Any other reason is a go-ahead to remove
@@ -114,7 +139,7 @@ function pls_remove(event)
 	mpv_pls:remove(plsID)
 	-- If the last file finishes playing, reason is still eof
 	-- So check if this was the last entry and if so, delete the playlist file.
-	if #mpv_pls <= 1 then
+	if #mpv_pls == 0 then
 		os.remove(options.playlist)
 		pls_deleted = true
 	end
