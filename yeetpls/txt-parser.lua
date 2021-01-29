@@ -15,14 +15,14 @@ local parser = {}
 -- 		or it could be a relative path. Handles multiple periods in succession
 -- 		so it allows relative paths like ..\ as well folder names with more than
 -- 		one period in succession
--- ([\w,\s;-]+(\.(%a+))?$) = Match all valid filenames, optionally without extension
+-- ([\w,\s;-]+(%.(%a+))?$) = Match all valid filenames, optionally without extension
 -- 		Filename with extension must be the end of it
-local full_winpath = "(%a:\\)?(([\w,\s;-]+(%.+)?)+\\)*([\w,\s;\.-]+(\.(%a+))?$)"
+local full_winpath = "(%a:((\\)|(/)))?(([\w,\s;-]+(%.+)?)+((\\)|(/)))*([\w,\s;%.-]+(%.(%a+))?$)"
 -- Uses forward slashes instead of >Windows backslashes
 -- Allows escaped whitespace. Most often encountered on files made on a Windows
 -- 		machine, or mounted NTFS drives. Dual boot system pain
 -- 		Escaping whitespace might not be necessry for applications.
-local full_path = "/(([\w-]+((\\)?\s)*(%.+)?)+/)*([\w\.-]+((\\)?\s)*(\.(%a+))?$)"
+local full_path = "/(([\w-]+((\\)?\s)*(%.+)?)+/)*([\w%.-]+((\\)?\s)*(%.(%a+))?$)"
 local mpv_tbl
 
 -- Check if a value is a playlist entry. v[1] is "filename" or similar, v[2] is the entry
@@ -71,15 +71,15 @@ function parser.test_format(pls)
 	-- 		or it could be a relative path. Handles multiple periods in succession
 	-- 		so it allows relative paths like ..\ as well as folder names with more than
 	-- 		one period in succession
-	-- ([\w,\s;-]+(\.(%a+))?$) = Match all valid filenames, optionally without extension
+	-- ([\w,\s;-]+(%.(%a+))?$) = Match all valid filenames, optionally without extension
 	-- 		File name with extension must be the end of it
-	local winpaths = "(%a:\\)?(([\w,\s;-]+(%.+)?)+\\)*([\w,\s;\.-]+(\.(%a+))?$)"
+	local winpaths = "(%a:\\)?(([\w,\s;-]+(%.+)?)+\\)*([\w,\s;%.-]+(%.(%a+))?$)"
 	local default_to_win = false
 	-- Uses forward slashes instead of >Windows backslashes
 	-- Allows escaped whitespace. Most often encountered on files made on a Windows
 	-- 		machine, or mounted NTFS drives. Dual boot system pain
 	-- 		Escaping whitespace might not be necessry for applications.
-	local paths = "(/)?(([\w-]+((\\)?\s)*(%.+)?)+/)*([\w\.-]+((\\)?\s)*(\.(%a+))?$)"
+	local paths = "(/)?(([\w-]+((\\)?\s)*(%.+)?)+/)*([\w%.-]+((\\)?\s)*(%.(%a+))?$)"
 	-- If we don't encounter anything weird, this stays true and we exit
 	local pass = true
 	local entries = split_entries(pls)
@@ -102,14 +102,6 @@ function parser.test_format(pls)
 		end
 	end
 	return pass -- All entries passed the test, playlist is correct.
-end
-
-function parser.load_pls(pls)
-	local ret = {}
-	for i,v in ipairs(split_entries(pls)) do
-		ret:insert(v)
-	end
-	return ret
 end
 
 -- Return the module for use in main.lua

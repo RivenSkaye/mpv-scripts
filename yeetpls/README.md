@@ -7,14 +7,10 @@ If this doesn't work, it notifies the user with an `error` message and exits.
 This script does not care about where it's being run from. So long as mpv can resolve the file names from the playlist, it's assumed this script can as well with no extra info
 
 ## Usage Notes ##
-You must both pass the playlist file to mpv however you normally would and, due to a [limitation in mpv](#Known-Issues), you must also pass the file to `--script-ops=yeetpls-playlist=<file>`.
+Due to a [limitation in mpv](#Known-Issues), you must pass the playlist file to `--script-ops=yeetpls-playlist=<file>`. Thanks to the `loadlist` internal input command, this script can **replace**
+the need for an input file or the use of the `--playlist` option.
 Optionally also pass the script-opt `create_file=true` if it doesn't exist and you want it to be made. _If it doesn't exist and you don't pass this option, it **will** error and exit._
 Current behavior is to bypass read check on the file and immediately open it in `a+` for reading, appending and creating.
-
-For parsers that provide playlist loading functionality as well (or those that leverage existing parsers' code to do so), you may also run mpv with
-`mpv --idle=once --script-opts=yeetpls-playlist=path/to/playlist` together with any other options and flags you'd usually set. This makes the script double as a playlist loader for mpv,
-so that it bypasses use of the `--playlist` flag altogether. _This functionality was born out of necessity and might not function as expected. This is also a cheap workaround to fix what I believe
-is a genuinely lacking feature on mpv's end_.
 
 This script assumes that **there is no shuffle applied**. It was made with the intention of automating the entire process from acquiring anime down to watching the show without doing anything
 other than pointing mpv to a playlist. I personally set up a simple script to run on download completion that automatically generates a file `playlist.txt` which is just a list of file names
@@ -31,7 +27,7 @@ Currently, due to a limitation of mpv, the script is unable to fetch the playlis
 a playlist file gets provided, the script currently requires a user to set a script-opt instead. The script-opt to be set is `yeetpls-playlist`, as per the standard outlined on mpv.io to
 automatically look for any script-opt named {script_name}-{opt_name}.
 
-Yes, this means specifying the file twice. Don't complain to me about this, I'm just the messenger. I already sent in a [feature request](https://github.com/mpv-player/mpv/issues/8508)
+Yes, this means specifying the file twice, or setting `--idle=[once | yes]`. Don't complain to me about this, I'm just the messenger. I already sent in a [feature request](https://github.com/mpv-player/mpv/issues/8508)
 to fix this, including all information I could get my hands on in regards to getting the playlist files. Someone suggested a possible fix on init time, but it doesn't work with the `--playlist` option.
 Feel free to suggest other ways of attempting to get the file though!
 _Behavior for this problem might change to instead attempt to load the playlist from just the script-opt and having the user add the flag to not close on idling. This remains to be seen as it changes
@@ -66,11 +62,6 @@ A new parser for a type of playlist files should provide at least two functions:
 		- Either use `print` or `mp.msg.warn` to notify the user of this.
 		- Optionally print a single line message on the OSD
 		- `return false` makes main.lua attempt to use a fallback, if that fails it provides a clean exit.
-- Optionally provide a `load_pls` function that takes the content of the playlist file as an argument
-	- This works to make the parser an alternative playlist loader to bypass `--playlist` altogether
-	- Make sure the parser object returned contains a field `loader` set to `true`
-	- Return value should be a table with just the file names or paths to load into mpv's internal playlist object
-	- `main.lua` will handle the actual updating of the internal playlist.
 
 **Make sure to add these to the module's exported function list**. The parser will be `require`d dynamically so if you don't expose `parser.format_pls`, it can't be used.
 

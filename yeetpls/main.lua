@@ -7,7 +7,7 @@ local parser = nil -- The parser used internally, set during init.
 local parser_name = nil -- This value is only used when stuff errors
 local pls_old = nil -- The old playlist file's content
 local mpv_pls = nil -- populated internally with mpv's playlist
-local pls_deleted = false -- prevents shutdown from eof from writing a new playlist file
+local pls_deleted = false -- prevents shutdown from eof before writing to file
 local options = {
 	-- whether or not to auto-delete playlist entries after playing them
 	auto_delete_entries = true, -- (*true | false)
@@ -34,6 +34,7 @@ function base_init()
 	if options.playlist_type == "auto" then -- Determine the type of playlist, this is based on the extension
 		filetype = options.playlist:reverse():match('.*%p'):reverse():sub(2)
 		msg.info("Reading playlist of type "..filetype)
+		options.playlist_type = filetype
 		-- More than willing to accept PRs that add tables to map extensions to playlist types,
 		-- in order to allow one parser to be used with any legal file type extension
 	else
@@ -95,8 +96,8 @@ else
 		msg.error(parser_name.." was unable to parse this playlist type ("..filetype.."). Exiting...")
 		return
 	else
-		-- TESTING INFO, success!
-		print("loading "..parser_name.." was successful!")
+	if #mpv_pls == 0 then
+		mp.commandv('loadlist', options.playlist, 'append')
 	end
 end
 
