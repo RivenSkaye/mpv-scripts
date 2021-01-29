@@ -20,7 +20,7 @@ local options = {
 
 	-- The type of playlist, used for processing defaults internally. Default is "auto" and makes the script check it
 	-- This list of filetypes is arbitrary and "auto" will allow for parsing anything that has a parser script available
-	playlist_type = "auto", -- ("txt" | "m3u" | "m3u8" | "pls" | *"auto")
+	playlist_type = "auto", -- ("txt" | *"auto" | the name of any of the existing parsers)
 	-- The playlist file. Due to limitations in the Lua env, this needs to be passed as a script-opt.
 	-- This playlist is parsed internally and only parses playlist types for which a parser is available.
 	playlist = "None", -- ("None" | "[/path/to/]<playlist_file.ext>")
@@ -109,14 +109,14 @@ function pls_remove(event)
 	end
 	-- Any other reason is a go-ahead to remove
 	local plsID = event.playlist_entry_id
+	-- remove it from the comparison table
+	mpv_pls:remove(plsID)
 	-- If the last file finishes playing, reason is still eof
 	-- So check if this was the last entry and if so, delete the playlist file.
 	if #mpv_pls <= 1 then
 		os.remove(options.playlist)
 		pls_deleted = true
 	end
-	-- remove it from the comparison table
-	mpv_pls:remove(plsID)
 end
 mp.register_event("end-file", pls_remove)
 
