@@ -11,9 +11,13 @@ local mpv_tbl
 
 -- Check if a value is a playlist entry. v[1] is "filename" or similar, v[2] is the entry
 function in_mpv(val)
-	for i,v in ipairs(mpv_tbl) do
-		if val == v[2] then
-			return true
+	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+		for k,v in pairs(e) do -- for key, value in index
+			if k:lower() ~= "playing" and k:lower() ~= "current" then
+				if val == v then
+					return true
+				end
+			end
 		end
 	end
 	return false
@@ -22,60 +26,46 @@ end
 -- Split all entries in the playlist file.
 -- Even though it's just newlines for this, it makes for a nice skeleton for other parsers.
 function split_entries(pls)
-	return pls:gmatch("[\r\n|\r|\n]")
+	local ret = {}
+	for str in pls:gmatch("[^\r\n|^\r|^\n]+") do
+		table.insert(ret, str)
+	end
+	return ret
 end
 
 -- Create the required functions within parser
 function parser.format_pls(pls_in, mpv_pls)
 	-- Split the entries by newlines, these can be '\r', '\n' or '\r\n'
-	local pls_tbl = pls_in:gmatch("[\r\n|\r|\n]")
+	local pls_tbl = {}
+	for str in pls_in:gmatch("[^\r\n|^\r|^\n]+") do
+		table.insert(pls_tbl, str)
+	end
 	mpv_tbl = mpv_pls
 	-- As strings are immutable, we'll leverage table.concat instead
 	local pls_out = {}
 	for i,v in ipairs(pls_tbl) do
 		if in_mpv(v) then
 			-- Yay, the value is still in the mpv playlist. Add it to the table
-			pls_out:insert(v)
+			table.insert(pls_out, v)
 		end
 	end
 	-- Return the playlist as a concatenated string
-	return pls_out:concat("\n")
+	return table.concat(pls_out, "\n")
 end
 
 -- Test if the input format matches the expected input and return a Boolean.
 -- Do this however seems most fit for the parser you wrote.
--- It is recommended to import this function into all other parsers to test
--- if the file paths are actually valid.
--- I'll deal with adding net streams later
+-- In practice, the only cgar that is truly illegal to add to a URI is NULL.
+-- The pain of patterns drove me to this point of "fuck it". Let mpv error if a name is borked instead.
 function parser.test_format(pls)
 	-- Checks all valid chars in file paths. Allows for periods in paths,
 	-- allows for files without extension.
-	local winpaths = "[%a:(/|\\)]?[[%w%s,;%.%-]+[/|\\]]?[%w%s,;%.%-]+[%.[%a+]]?$"
-	local default_to_win = false
-	-- Uses forward slashes instead of >Windows backslashes and mixed
-	-- Allows (escaped) whitespace. Most often encountered on files made on a Windows
-	-- 		machine, or mounted NTFS drives. Dual boot system pain
-	-- 		Escaping whitespace might not be necessry for applications.
-	local paths = "[/]?[[%w(\\?%s)%.%-]+/]*[%w(\\?%s)%.%-]+[%.[%a+]]?$"
-	-- If we don't encounter anything weird, this stays true and we exit
 	local pass = true
 	local entries = split_entries(pls)
 	local t = {}
 	for index,entry in ipairs(entries) do
-		if not default_to_win then
-			if not entry:find(paths) then
-				if not entry:find(winpaths) then
-					pass = false
-					break
-				else
-					default_to_win = true
-				end
-			end
-		else
-			if not entry:find(winpaths) then
-				pass = false
-				break
-			end
+		if entry:find("%z") then -- This filename contains the NULL character. This is universally not allowed
+			pass=false
 		end
 	end
 	return pass -- All entries passed the test, playlist is correct.
