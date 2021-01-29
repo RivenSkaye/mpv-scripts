@@ -7,22 +7,6 @@
 -- paths, the parser will deem your playlist unparsable. Deal with it.
 
 local parser = {}
-
--- Checks all valid chars in filepaths. Allows for periods in paths, allows no extension
--- (%a:\\)? = Drive letter, may occur once
--- (([\w,\s;-]+(%.+)?)+\\)* = Valid folder names, with periods. Add a backslash.
--- 		May occur an arbitrary number of times, file could be in the drive root
--- 		or it could be a relative path. Handles multiple periods in succession
--- 		so it allows relative paths like ..\ as well folder names with more than
--- 		one period in succession
--- ([\w,\s;-]+(%.(%a+))?$) = Match all valid filenames, optionally without extension
--- 		Filename with extension must be the end of it
-local full_winpath = "(%a:((\\)|(/)))?(([\w,\s;-]+(%.+)?)+((\\)|(/)))*([\w,\s;%.-]+(%.(%a+))?$)"
--- Uses forward slashes instead of >Windows backslashes
--- Allows escaped whitespace. Most often encountered on files made on a Windows
--- 		machine, or mounted NTFS drives. Dual boot system pain
--- 		Escaping whitespace might not be necessry for applications.
-local full_path = "/(([\w-]+((\\)?\s)*(%.+)?)+/)*([\w%.-]+((\\)?\s)*(%.(%a+))?$)"
 local mpv_tbl
 
 -- Check if a value is a playlist entry. v[1] is "filename" or similar, v[2] is the entry
@@ -38,13 +22,13 @@ end
 -- Split all entries in the playlist file.
 -- Even though it's just newlines for this, it makes for a nice skeleton for other parsers.
 function split_entries(pls)
-	return pls:gmatch("(\r\n)|(\r)|(\n)")
+	return pls:gmatch("[\r\n|\r|\n]")
 end
 
 -- Create the required functions within parser
 function parser.format_pls(pls_in, mpv_pls)
 	-- Split the entries by newlines, these can be '\r', '\n' or '\r\n'
-	local pls_tbl = pls_in:gmatch("(\r\n)|(\r)|(\n)")
+	local pls_tbl = pls_in:gmatch("[\r\n|\r|\n]")
 	mpv_tbl = mpv_pls
 	-- As strings are immutable, we'll leverage table.concat instead
 	local pls_out = {}
@@ -64,22 +48,15 @@ end
 -- if the file paths are actually valid.
 -- I'll deal with adding net streams later
 function parser.test_format(pls)
-	-- Checks all valid chars in file paths. Allows for periods in paths, allows no extension
-	-- (%a:\\)? = Drive letter, may occur once
-	-- (([\w,\s;-]+(%.+)?)+\\)* = Valid folder names, with periods. Add a backslash.
-	-- 		May occur an arbitrary number of times, file could be in the drive root
-	-- 		or it could be a relative path. Handles multiple periods in succession
-	-- 		so it allows relative paths like ..\ as well as folder names with more than
-	-- 		one period in succession
-	-- ([\w,\s;-]+(%.(%a+))?$) = Match all valid filenames, optionally without extension
-	-- 		File name with extension must be the end of it
-	local winpaths = "(%a:\\)?(([\w,\s;-]+(%.+)?)+\\)*([\w,\s;%.-]+(%.(%a+))?$)"
+	-- Checks all valid chars in file paths. Allows for periods in paths,
+	-- allows for files without extension.
+	local winpaths = "[%a:(/|\\)]?[[%w%s,;%.%-]+[/|\\]]?[%w%s,;%.%-]+[%.[%a+]]?$"
 	local default_to_win = false
-	-- Uses forward slashes instead of >Windows backslashes
-	-- Allows escaped whitespace. Most often encountered on files made on a Windows
+	-- Uses forward slashes instead of >Windows backslashes and mixed
+	-- Allows (escaped) whitespace. Most often encountered on files made on a Windows
 	-- 		machine, or mounted NTFS drives. Dual boot system pain
 	-- 		Escaping whitespace might not be necessry for applications.
-	local paths = "(/)?(([\w-]+((\\)?\s)*(%.+)?)+/)*([\w%.-]+((\\)?\s)*(%.(%a+))?$)"
+	local paths = "[/]?[[%w(\\?%s)%.%-]+/]*[%w(\\?%s)%.%-]+[%.[%a+]]?$"
 	-- If we don't encounter anything weird, this stays true and we exit
 	local pass = true
 	local entries = split_entries(pls)
