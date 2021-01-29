@@ -5,7 +5,7 @@ This repository is just a dumpsite for me for any mpv scripts I create. I decide
 Then after pondering how to do this, I figured I might as well write some scripts for [mpv](https://mpv.io) since I use the player a lot and there's some functionality I can think of that I'd like to have.
 
 ## Scripts to be found here ##
-If the script doesn't exist yet, expect a branch to be made soon™. If you have suggestions, feel free to fork or contact me\* about it!
+If the script doesn't exist yet, expect a branch to be made soon™. If you have suggestions, feel free to fork or [contact me](#Contact) about it!
 |    Name    |                Description                |
 |------------|-------------------------------------------|
 | yeet-pls   | Delete playlist entries after playing them, or the entire playlist file when done |
@@ -19,8 +19,13 @@ Branches in this repo will be ordered a bit different from most projects because
 - Changes to a script should **only** be made in the branch of the same name;
 - If a branch doesn't exist, create it;
 - If a script is deemed stable and complete, the branch will be deleted after 9 weeks of inactivity;
-- If you wish to contribute to this repo rather than fork, shoot me a message\* and we'll see if I can add you;
-  - It's advisable to have sent in PRs before you request being added to the repo.
+- If you wish to contribute to this repo rather than fork, [shoot me a message](#Through-Discord) and we'll see if I can add you;
+  - It's advisable to have sent in PRs before you request being added to the repo as a contributor.
+  - In some cases of ~~favoritism~~ personal contacts, I'll add people I know and have faith in to write good code
 
 # Contact #
-You can reach me through the issue system here on github, or through Discord as `@Scuffed Riven#0042`.
+## Through GitHub ##
+Feel free to fork the repo and send in a PR, or use the Issue system to notify me of bugs and missing features.
+
+## Through Discord ##
+You can find me in various servers, or shoot me a DM. You should be able to find me pretty easily, my tag is `@Scuffed Riven#0042`.
