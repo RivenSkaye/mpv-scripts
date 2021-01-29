@@ -121,7 +121,7 @@ if options.make_config then
 		file:write("# Playlist file to load. Setting this here can cause some issues, so be careful!\nplaylist=None # [None | any file path or name you want]")
 		file:write("# Whether or not to create the playlist file if it doesn't already exist. Some edge cases can cause issues.\ncreate_file=false\n\n")
 		file:write("# Emergency option to exit the script without doing anything. THIS SHOULD ONLY BE SET TO TRUE THROUGH --SCRIPT-OPS. Disables the script entirely!\nexit=false\n")
-		-- Files should end with a blank line, this is common sense.
+		-- Files should end with a newline, this is common sense.
 	end
 end
 
