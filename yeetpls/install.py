@@ -1,6 +1,8 @@
 import urllib.request as req
 import sys.argv as argv
 import platform
+from pathlib import Path
+import os
 
 helps = ['-h', '-help', '--h', '--help']
 if any([h == a for h in helps for a in argv]):
@@ -24,14 +26,18 @@ else:
 
 if default and not opts['scripts']:
     if platform.system().lower() == "windows":
-        opts['scripts'] = "%APPDATA%/mpv/scripts/"
+        opts['scripts'] = r"%APPDATA%/mpv/scripts/"
     else:
         opts['scripts'] = "~/.config/mpv/scripts/"
 
 if not opts['scripts'].endswith("/"):
     opts['scripts'] += "/"
-if windows:
+opts['scripts'] += "yeetpls/"
+if windows: # honestly, this OS is a pain to deal with
+    opts['scripts'] = opts['scripts'].replace(r"%APPDATA%", os.getenv('APPDATA'))
     opts['scripts'] = opts['scripts'].replace("/", "\\")
+
+Path(opts['scripts']).mkdir(parents=True, exist_ok=True)
 # Base URL so we only need to append file names. We'll use format in a loop for this
 base_url = "https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/yeetpls-installer/yeetpls/{}"
 
@@ -43,3 +49,6 @@ for line in filelist:
     content = request.read().decode(response.headers.get_content_charset()).replace("\r\n", "\n").split("\n")
     with open(opts['scripts']+line) as f:
         f.writelines(content)
+
+print(f"Should've been successful installing all required files to '{opts['scripts']}'. Thanks for using me and don't forget to run me again for upates!")
+exit(0)
