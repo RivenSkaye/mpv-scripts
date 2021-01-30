@@ -29,9 +29,6 @@ local options = {
 	exit = "no" -- (yes | *no)
 }
 opts.read_options(options, "yeetpls")
-for k,v in pairs(options) do
-	print("Key: "..k.."; Value: "..tostring(v))
-end
 
 -- Basic initialization. Wrapped in a function so we can properly exit the script if anything fails
 function base_init()
@@ -59,12 +56,6 @@ function base_init()
 		msg.warn("No "..filetype.."-parser.lua found, trying to parse as text file")
 		parser = require("txt-parser")
 		parser_name = "txt-parser"
-		-- Perform a special check in txt-parser.lua to see if this is a plaintext playlist.
-		-- This is _only_ done for the txt-parser as it's the base to build on and the only feasible check.
-		if not parser.check_txt(options.playlist) then
-			msg.error("txt-parser was unable to process this file. Exiting...")
-			return false
-		end
 	else
 		-- We have a parser, save the name in case of errors
 		parser_name = filetype.."-parser"
