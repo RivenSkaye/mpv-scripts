@@ -8,7 +8,17 @@ Then after pondering how to do this, I figured I might as well write some script
 If the script doesn't exist yet, expect a branch to be made soon™. If you have suggestions, feel free to fork or [contact me](#Contact) about it!
 |    Name    |                Description                |
 |------------|-------------------------------------------|
-| yeet-pls   | Delete playlist entries after playing them, or the entire playlist file when done |
+| yeetpls    | Delete playlist entries after playing them, or the entire playlist file when done |
+
+# Installing #
+For any and all of the scripts, they work as all mpv user scripts work. You put them in the global or user-local scripts directory. Information
+on what folders these are on your system can be found in the [mpv docs](https://mpv.io/manual/master/#files). As always, Windows is a special case, located right below the normal OS info.
+
+As for making sure it works, _just stick to the directory structure here_ and it should work just fine. If a script is multiple files, it should be a folder in the scripts directory that contains
+a file named `main.ext` (where `ext` denotes the file type). If a script is just a single file, toss it into the scripts folder and it's done. **Never move a script file out of its folder,
+or shit will hit the fan**. For example `main.lua` will be loaded, but it can't find any of its modules. Or a module will be loaded as standalone script, doing nothing _and_ causing `main.lua` to
+throw errors. And that gives you those scary red messages on the CLI that make you panic and bug report.
+
 
 # Contributing #
 Branches in this repo will be ordered a bit different from most projects because I want to make contributing easy for all. And since this repo is supposed to be a collection, we don't want to accidentally push changes to an unstable file when another one has a stable update.
