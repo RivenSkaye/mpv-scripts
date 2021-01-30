@@ -14,9 +14,10 @@ If the script doesn't exist yet, expect a branch to be made soon™. If you have
 For any and all of the scripts, they work as all mpv user scripts work. You put them in the global or user-local scripts directory. Information
 on what folders these are on your system can be found in the [mpv docs](https://mpv.io/manual/master/#files). As always, Windows is a special case, located right below the normal OS info.
 
-As for making sure it works, _just stick to the directory structure here_ and it should work just fine. If a script is multiple files, it should be a folder in the scripts directory that contains
-a file named `main.ext` (where `ext` denotes the file type). If a script is just a single file, toss it into the scripts folder and it's done. **Never move a script file out of its folder,
-or shit will hit the fan**. For example `main.lua` will be loaded, but it can't find any of its modules. Or a module will be loaded as standalone script, doing nothing _and_ causing `main.lua` to
+As for making sure it works, _just stick to the directory structure here_ and it should work just fine. Copy folders as they are here and put the files in those places. Files in the root of the git
+should logically be in the root of your scripts folder. If a script is multiple files, it should be a folder in the scripts folder that contains
+a file named `main.ext` (where `ext` denotes the file type). **Never move a script file out of its folder, or shit will hit the fan**.
+For example `main.lua` will be loaded, but it can't find any of its modules. Or a module will be loaded as standalone script, doing nothing _and_ causing `main.lua` to
 throw errors. And that gives you those scary red messages on the CLI that make you panic and bug report.
 
 
