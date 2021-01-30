@@ -1,11 +1,12 @@
 import urllib.request as req
-import sys.argv as argv
+import sys
 import platform
 from pathlib import Path
 import os
 
+argv = sys.argv
 helps = ['-h', '-help', '--h', '--help']
-if any([h == a for h in helps for a in argv]):
+if any([h == a for h in helps for a in argv]) or len(argv) <= 1:
     print("Installs the yeetpls user script for mpv. Valid options are:")
     print("-default\t\tUses the default user-based scripts dir for this user. If this is supplied, specified folders get ignored.")
     print("-scripts <path/to/scripts/folder>\tSpecify a folder.")
@@ -27,6 +28,7 @@ else:
 if default and not opts['scripts']:
     if platform.system().lower() == "windows":
         opts['scripts'] = r"%APPDATA%/mpv/scripts/"
+        windows=True
     else:
         opts['scripts'] = "~/.config/mpv/scripts/"
 
@@ -34,7 +36,7 @@ if not opts['scripts'].endswith("/"):
     opts['scripts'] += "/"
 opts['scripts'] += "yeetpls/"
 if windows: # honestly, this OS is a pain to deal with
-    opts['scripts'] = opts['scripts'].replace(r"%APPDATA%", os.getenv('APPDATA'))
+    opts['scripts'] = opts['scripts'].replace("%APPDATA%", os.getenv('APPDATA'))
     opts['scripts'] = opts['scripts'].replace("/", "\\")
 
 Path(opts['scripts']).mkdir(parents=True, exist_ok=True)
@@ -44,11 +46,15 @@ base_url = "https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/yeetpls-ins
 response = req.urlopen(base_url.format("filelist.txt"))
 filelist = response.read().decode(response.headers.get_content_charset()).replace("\r\n", "\n").split("\n")
 for line in filelist:
+    if len(line) < 1 or line.startswith('#'):
+        continue
     url = base_url.format(line)
     request = req.urlopen(url)
-    content = request.read().decode(response.headers.get_content_charset()).replace("\r\n", "\n").split("\n")
-    with open(opts['scripts']+line) as f:
-        f.writelines(content)
+    content = request.read().decode(response.headers.get_content_charset()).replace("\r\n", "\n")
+    if windows:
+        content.replace("\n", "\r\n") # at least we won't get \r\r\n this way
+    with open(opts['scripts']+line, 'w+') as f:
+        f.write(content)
 
 print(f"Should've been successful installing all required files to '{opts['scripts']}'. Thanks for using me and don't forget to run me again for upates!")
 exit(0)
