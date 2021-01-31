@@ -25,19 +25,24 @@ else:
     if given == "default":
         default = True
 
+if platform.system().lower() == "windows":
+    windows = True
+
 if default and not opts['scripts']:
-    if platform.system().lower() == "windows":
+    if windows:
         opts['scripts'] = r"%APPDATA%/mpv/scripts/"
-        windows=True
     else:
         opts['scripts'] = "~/.config/mpv/scripts/"
+
+if windows: # honestly, this OS is a pain to deal with
+    opts['scripts'] = opts['scripts'].replace("%APPDATA%", os.getenv('APPDATA'))
+    opts['scripts'] = opts['scripts'].replace("/", "\\")
+else:
+    opts['scripts'] = opts['scripts'].replace("~", os.getenv('$HOME'))
 
 if not opts['scripts'].endswith("/"):
     opts['scripts'] += "/"
 opts['scripts'] += "yeetpls/"
-if windows: # honestly, this OS is a pain to deal with
-    opts['scripts'] = opts['scripts'].replace("%APPDATA%", os.getenv('APPDATA'))
-    opts['scripts'] = opts['scripts'].replace("/", "\\")
 
 Path(opts['scripts']).mkdir(parents=True, exist_ok=True)
 # Base URL so we only need to append file names. We'll use format in a loop for this

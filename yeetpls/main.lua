@@ -86,7 +86,8 @@ function base_init()
 	return true
 end
 
-if options.playlist == "None" or options.exit == "yes" then -- silently exit
+if options.playlist == "None" or options.exit == "yes" then -- exit since we're useless here
+	msg.info("No playlist being played. Exiting...")
 	return
 else
 	if not base_init() then -- something caused a failure, exit.
@@ -102,7 +103,7 @@ end
 -- If the script is global and the user wants their own custom config, they can do it themselves
 if options.makeConfig == "yes" then
 	-- create the config file and alert the user
-	local config_file = mp.get_script_directory():gsub("scripts[/|\\].*", "script-ops/yeetpls.conf")
+	local config_file = mp.get_script_directory():gsub("scripts[/|\\].*", "script-opts/yeetpls.conf")
 	if mp.get_property_native('options/vo-mmcss-profile', o) ~= o then
 		config_file = config_file:gsub("/", "\\")
 	end
@@ -111,15 +112,15 @@ if options.makeConfig == "yes" then
 		msg.error("Couldn't create config file, recieved error "..tostring(errcode)..": "..tostring(err))
 		msg.info("To prevent getting this message again, make sure the script can write to '"..config_file.."' or create a default config file for yeetpls that sets makeConfig=false")
 	else
-		msg.info("Setting all defaults for the script settings. Using current settings from --script-ops except for makeConfig, playlistType and playlist")
+		msg.info("Setting all defaults for the script settings. Using current settings from --script-opts except for makeConfig, playlistType and playlist")
 		file:write("# Config file for the yeetpls Lua script. All options are followed by a comment listing all legal values, the default for the script is indicated with *\n\n")
-		file:write("# Whether or not to (re)create the default config file\nmakeConfig=no # [yes | *no]\n\n")
+		file:write("# Whether or not to (re)create the default config file\nmakeConfig=no\n# [yes | *no]\n\n")
 		file:write("# Whether or not to delete entries in the playlist file, makes VERY little sense to turn off since it's what the script was made for\nautoDeleteEntries="..tostring(options.autoDeleteEntries).." # [*yes | no]\n\n")
-		file:write("# Whether or not to delete the playlist file after finishing the last file\nautoDeleteFile="..tostring(options.autoDeleteFiles).." # [*yes | no]")
-		file:write("# The type of playlist, and by extension what parser, to use. The script can figure this out during runtime.\nplaylistType=auto # [*auto | txt | ...] make sure this matches one of the *-parser.lua files exactly!")
-		file:write("# Playlist file to load. Setting this here can cause some issues, so be careful!\nplaylist=None # [None | any file path or name you want]")
-		file:write("# Whether or not to create the playlist file if it doesn't already exist. Some edge cases can cause issues.\ncreateFile=no # [yes | *no]\n\n")
-		file:write("# Emergency option to exit the script without doing anything. THIS SHOULD ONLY BE SET TO TRUE THROUGH --SCRIPT-OPS. Disables the script entirely!\nexit=no # [*no | *no | *no | yes]\n")
+		file:write("# Whether or not to delete the playlist file after finishing the last entry\nautoDeleteFile="..tostring(options.autoDeleteFile).."\n# [*yes | no]")
+		file:write("# The type of playlist, and by extension what parser, to use. The script can figure this out during runtime.\nplaylistType=auto\n# [*auto | txt | ...] make sure this matches one of the *-parser.lua files exactly!")
+		file:write("# Playlist file to load. Setting this here can cause some issues, so be careful!\nplaylist=None\n# [None | any file path or name you want]")
+		file:write("# Whether or not to create the playlist file if it doesn't already exist. Some edge cases can cause issues.\ncreateFile=no\n# [yes | *no]\n\n")
+		file:write("# Emergency option to exit the script without doing anything. THIS SHOULD ONLY BE SET TO TRUE THROUGH --SCRIPT-OPTS. Disables the script entirely!\nexit=no\n# [*no | *no | *no | yes]\n")
 		-- Files should end with a newline, this is common sense.
 	end
 end
