@@ -15,7 +15,7 @@ For any and all of the scripts, they work as all mpv user scripts work. You put 
 on what folders these are on your system can be found in the [mpv docs](https://mpv.io/manual/master/#files).
 As always, Windows is a special case, located right below the normal OS info.
 
-For scripts with an `installer.py` in their directory, just run that for easy setup. I might change it to take in script names later, so that a
+For scripts with an `installer.py` (Python 3.x!) in their directory, just run that for easy setup. I might change it to take in script names later, so that a
 single installer script can be used for every  script that comes to live here. But that's something to consider when more scripts appear.
 Especially since I'd also have to take into account what scripts are single files and what scripts have directories. ~~unless I decide to just put
 all single-file scripts into directories of their own as well to clutter the tree~~
