@@ -12,7 +12,13 @@ If the script doesn't exist yet, expect a branch to be made soon™. If you have
 
 # Installing #
 For any and all of the scripts, they work as all mpv user scripts work. You put them in the global or user-local scripts directory. Information
-on what folders these are on your system can be found in the [mpv docs](https://mpv.io/manual/master/#files). As always, Windows is a special case, located right below the normal OS info.
+on what folders these are on your system can be found in the [mpv docs](https://mpv.io/manual/master/#files).
+As always, Windows is a special case, located right below the normal OS info.
+
+For scripts with an `installer.py` in their directory, just run that for easy setup. I might change it to take in script names later, so that a
+single installer script can be used for every  script that comes to live here. But that's something to consider when more scripts appear.
+Especially since I'd also have to take into account what scripts are single files and what scripts have directories. ~~unless I decide to just put
+all single-file scripts into directories of their own as well to clutter the tree~~
 
 As for making sure it works, _just stick to the directory structure here_ and it should work just fine. Copy folders as they are here and put the files in those places. Files in the root of the git
 should logically be in the root of your scripts folder. If a script is multiple files, it should be a folder in the scripts folder that contains
