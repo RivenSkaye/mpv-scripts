@@ -12,7 +12,7 @@ if any([h == a for h in helps for a in argv]) or len(argv) <= 1:
     print("-scripts <path/to/scripts/folder>\tSpecify a folder.")
     print("-h, -help, --h, --help\tSummons this message and exits. If this is present, all other options will be ignored.")
     exit(0)
-print("Welcome to the yeetpls installer! If you set the '-scripts' flag to a path, we'll download the files there. If you didn't, please input it now.")
+print("Welcome to the yeetpls installer! If you set the '-scripts' flag to a path, we'll download the files there. If you used -default, we'll put them in the usual places.")
 opts = {'scripts': None}
 default = False
 windows = False
@@ -34,19 +34,19 @@ if default and not opts['scripts']:
     else:
         opts['scripts'] = "~/.config/mpv/scripts/"
 
+if not opts['scripts'].endswith("/"):
+    opts['scripts'] += "/"
+opts['scripts'] += "yeetpls/"
+
 if windows: # honestly, this OS is a pain to deal with
     opts['scripts'] = opts['scripts'].replace("%APPDATA%", os.getenv('APPDATA'))
     opts['scripts'] = opts['scripts'].replace("/", "\\")
 else:
     opts['scripts'] = opts['scripts'].replace("~", os.getenv('$HOME'))
 
-if not opts['scripts'].endswith("/"):
-    opts['scripts'] += "/"
-opts['scripts'] += "yeetpls/"
-
 Path(opts['scripts']).mkdir(parents=True, exist_ok=True)
 # Base URL so we only need to append file names. We'll use format in a loop for this
-base_url = "https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/yeetpls-installer/yeetpls/{}"
+base_url = "https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/master/yeetpls/{}"
 
 response = req.urlopen(base_url.format("filelist.txt"))
 filelist = response.read().decode(response.headers.get_content_charset()).replace("\r\n", "\n").split("\n")
