@@ -3,6 +3,9 @@
 *.komodoproject
 .komodotools
 
+## Python ##
+__pycache__/
+
 ##Lua##
 test.lua
 # Compiled Lua sources #
