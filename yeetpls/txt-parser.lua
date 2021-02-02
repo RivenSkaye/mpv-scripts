@@ -63,12 +63,20 @@ function parser.test_format(pls)
 	local pass = true
 	local entries = split_entries(pls)
 	local t = {}
+	local fwp = "^%a:[\\/][.-\\/]*.+%.%w+" -- Full Windows path
+	local fnp = "/[.-/]*.+%.%w+" -- full *NIX path
+	local rfp = "[%.+\\/]?[.-\\/]*.+%.%w+" -- relative file path
+	local jaf = ".+%.%w+" -- Just a file
+	local upe = "%a+://[.+%.]?%w+%.%w+[/.]*" -- URL playlist entry
 	for index,entry in ipairs(entries) do
-		if entry:find("[^%z<>:%|%?%*\"]") then -- This filename contains the NULL character. This is universally not allowed
+		if not entry:find("[^%z<>:%|%?%*\"]") then -- This path contains disallowed chars. Win == NIX here, due to effort and media should work everywhere.
 			pass=false
+		elseif not entry:find(fwp) or not entry:find(fnp) or not entry:find(rfp) or not entry:find(jaf) -- check for paths here. If we don't find them...
+			if not entry:find(upe) -- check for URLs. If none:
+				pass=false -- it matches no known inputs
 		end
 	end
-	return pass -- All entries passed the test, playlist is correct.
+	return pass -- All entries passed the test, playlist is correct if this is true.
 end
 
 -- Return the module for use in main.lua
