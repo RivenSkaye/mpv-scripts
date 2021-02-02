@@ -64,7 +64,7 @@ function parser.test_format(pls)
 	local entries = split_entries(pls)
 	local t = {}
 	for index,entry in ipairs(entries) do
-		if entry:find("%z") then -- This filename contains the NULL character. This is universally not allowed
+		if entry:find("[^%z<>:%|%?%*\"]") then -- This filename contains the NULL character. This is universally not allowed
 			pass=false
 		end
 	end
