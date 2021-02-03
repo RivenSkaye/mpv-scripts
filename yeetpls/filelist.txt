@@ -1,2 +1,6 @@
+# Main script, this requires at least the txt-parser. Feel free to delete any other parsers if you'll never use them
 main.lua
+# This is a HARD requirement, not just in main, but can be referenced from other parsers as well
 txt-parser.lua
+# Very common filetype for playlists, recommended to have
+pls-parser.lua
