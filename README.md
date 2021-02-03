@@ -43,7 +43,8 @@ Branches in this repo will be ordered a bit different from most projects because
 - If a script is deemed stable and complete, the branch will be deleted after 9 weeks of inactivity;
 - If you wish to contribute to this repo rather than fork, [shoot me a message](#Through-Discord) and we'll see if I can add you;
   - It's advisable to have sent in PRs before you request being added to the repo as a contributor.
-  - In some cases of ~~favoritism~~ personal contacts, I'll add people I know and have faith in to write good code
+  - In some cases of ~~favoritism~~ personal contacts, I'll add people I know and have faith in to write good code.
+- For more info on script collections (for example [`yeetpls`](/yeetpls)), look at the README in the top-level folder.
 
 # Contact #
 ## Through GitHub ##
