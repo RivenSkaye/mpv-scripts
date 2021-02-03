@@ -8,7 +8,8 @@ This script does not care about where it's being run from. So long as mpv can re
 
 ## Usage Notes ##
 Due to a [limitation in mpv](#Known-Issues), you must pass the playlist file to `--script-ops=yeetpls-playlist=<file>`. Thanks to the `loadlist` internal input command, this script can **replace**
-the need for an input file or the use of the `--playlist` option.
+the need for an input file or the use of the `--playlist` option. My own command is usually `mpv --idle=once --script-opts=yeetpls-playlist=playlist.txt`. Setting `idle=once` (or `yes`) is a hard
+requirement here, because mpv will **__NOT__** init any scripts if it's not allowed to idle. You could also set this option in your mpv.conf so that `--idle=once` is always applied.
 Optionally also pass the script-opt `create_file=true` if it doesn't exist and you want it to be made. _If it doesn't exist and you don't pass this option, it **will** error and exit._
 Current behavior is to bypass read check on the file and immediately open it in `a+` for reading, appending and creating.
 
@@ -46,7 +47,7 @@ A new parser for a type of playlist files should provide at least two functions:
 	- The value returned should be a string that can be written to a playlist file, according to the playlist spec.
 - `test_format`:
 	- Argument given for this function is always just the content of the file.
-	- The value returned should be a boolean.
+	- The value returned should be a Boolean.
 	- If multiple format specs allow for the same parser to be used (m3u/m3u8 for example), an extra step is required:
 		- Mention this in any PR to add functionality
 		- Provide a list of all formats that match
@@ -59,11 +60,13 @@ A new parser for a type of playlist files should provide at least two functions:
 		- Not dropping fields that could fairly easily be implemented
 		- If a file takes note of URL/local file/webstream, please try to match this in the output
 	- Do not throw errors if a file is a mismatch to the spec
-		- Either use `print` or `mp.msg.warn` to notify the user of this.
+		- Use one of the `mp.msg` functions to notify the user of this.
 		- Optionally print a single line message on the OSD
 		- `return false` makes main.lua attempt to use a fallback, if that fails it provides a clean exit.
+		- This fallback may or may not break the entire input file, I might change this behavior later.
 
-**Make sure to add these to the module's exported function list**. The parser will be `require`d dynamically so if you don't expose `parser.format_pls`, it can't be used.
+**Make sure to add these to the module's exported function list**. The parser will be `require`d as `parser=require(type.."-parser")`, so if you don't expose `parser.format_pls`, it can't be used.
+Anything else you add to the module's export list will be ignored by `main.lua`.
 
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, [this code](./main.lua) is gonna be happy with it.

@@ -21,11 +21,13 @@ function in_mpv(val)
 	return false
 end
 
+--- Split all entries from the file content and return this as a table per line
 -- Split all entries in the playlist file.
 -- Even though it's just newlines for this, it makes for a nice skeleton for other parsers.
-function split_entries(pls)
+-- Exported for ease of use for other parsers as a split by line function
+function parser.split_entries(pls)
 	local ret = {}
-	for str in pls:gmatch("[^\r\n|^\r|^\n]+") do
+	for str in pls:gmatch("[^\r\n]+") do
 		table.insert(ret, str)
 	end
 	return ret
@@ -35,7 +37,7 @@ end
 function parser.format_pls(pls_in, mpv_pls)
 	-- Split the entries by newlines, these can be '\r', '\n' or '\r\n'
 	local pls_tbl = {}
-	for str in pls_in:gmatch("[^\r\n|^\r|^\n]+") do
+	for str in pls_in:gmatch("[^\r\n|^\r|^\n]+") do -- Not sure the pipes hold any special meaning, but it works on Windows at least
 		table.insert(pls_tbl, str)
 	end
 	mpv_tbl = mpv_pls
@@ -51,31 +53,75 @@ function parser.format_pls(pls_in, mpv_pls)
 	return table.concat(pls_out, "\n")
 end
 
+-- Used in both the parser.test_format and parser.testutil functions.
+local illegal = "^%s?[^%z<>:%|%?%*\"]+[%s$]?[%.$]?" -- All chars illegal in Windows filenames. Also checks for the illegal start with whitespace and end with whitespace or periods
+local fwp = "^%a:[\\/][.-\\/]*.+%.%w+" -- Full Windows path
+local fnp = "/[.-/]*.+%.%w+" -- full *NIX path
+local rfp = "[%.+\\/]?[.-\\/]*.+%.%w+" -- relative file path
+local jaf = ".+%.%w+" -- Just a file
+-- URIs have different legal and illegal characters. Anything not in the following list is never legal in a URI
+local url_illegal = "[^%w%-%.%_%~%:%/%?%#%[%]%@%!%$%&%'%(%)%*%+%,%;%=%%]"
+local upe = "%a+://[.+%.]?%w+%.%w+[/.]*" -- URL playlist entry
 -- Test if the input format matches the expected input and return a Boolean.
 -- Do this however seems most fit for the parser you wrote.
 -- In practice, the only cgar that is truly illegal to add to a URI is NULL.
 -- The pain of patterns drove me to this point of "fuck it". Let mpv error if a name is borked instead.
 function parser.test_format(pls)
-	-- Checks all valid chars in file paths. Allows for periods in paths,
-	-- allows for files without extension.
+	-- Checks all valid chars in file paths. Allows for periods in paths
 	local pass = true
 	local entries = split_entries(pls)
 	local t = {}
-	local fwp = "^%a:[\\/][.-\\/]*.+%.%w+" -- Full Windows path
-	local fnp = "/[.-/]*.+%.%w+" -- full *NIX path
-	local rfp = "[%.+\\/]?[.-\\/]*.+%.%w+" -- relative file path
-	local jaf = ".+%.%w+" -- Just a file
-	local upe = "%a+://[.+%.]?%w+%.%w+[/.]*" -- URL playlist entry
 	for index,entry in ipairs(entries) do
-		if not entry:find("[^%z<>:%|%?%*\"]") then -- This path contains disallowed chars. Win == NIX here, due to effort and media should work everywhere.
+		if not entry:find(illegal) then -- This path contains disallowed chars. Win == NIX here, due to effort. And media should work everywhere.
 			pass=false
 		elseif not entry:find(fwp) or not entry:find(fnp) or not entry:find(rfp) or not entry:find(jaf) then -- check for paths here. If we don't find them...
-			if not entry:find(upe) then -- check for URLs. If none:
-				pass=false -- it matches no known inputs
-			end
+			pass=false -- it matches no known inputs
+		end
+	end
+	-- This might just be a legal URL, they have different allowed and illegal chars than files
+	if not pass and not entry:find(url_illegal) then
+		if entry:find(upe) then
+			pass = true
 		end
 	end
 	return pass -- All entries passed the test, playlist is correct if this is true.
+end
+
+--- Special function exposed for other parsers that want to test a single
+-- file name / path / URL rather than the entire playlist
+-- @param entry The entry to test
+-- @param[opt="all"] test Type of entry to check, use "all" for unknown.
+-- Valid values are "all", "file", "path", "relative", "url"
+-- @return Whether or not this matches any of the patterns requested.
+function parser.testentry(entry, test)
+	local types = {
+		file = {jaf},
+		path = {fnp, fwp},
+		relative = {rfp},
+		all = {fwp, fnp, rfp, jaf}
+	}
+	local pass = true
+	-- This contains illegal file names
+	if not test == "url" and entry:find(illegal) then pass = false end
+	if not test == "url" and pass then
+		-- Check all of the requested patterns
+		for i,v in ipairs(types[pls_type]) do
+			-- If we find a match, return true
+			if entry:find(v) then return true end
+		end
+	end
+	-- if we didn't return true yet, assume it's not valid
+	pass = false
+	if not entry:find(url_illegal) then
+		if test == "all" or test == "url" then
+			if entry:find(upe) then
+				-- unless it's a valid URI
+				pass = true
+			end
+		end
+	end
+	-- if all tests fail:
+	return pass
 end
 
 -- Return the module for use in main.lua
