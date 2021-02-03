@@ -33,7 +33,7 @@ Feel free to suggest other ways of attempting to get the file though!
 _Behavior for this problem might change to instead attempt to load the playlist from just the script-opt and having the user add the flag to not close on idling. This remains to be seen as it changes
 the requirements to parsers as well, to read playlists on start and parse them to a table instead of just the other way around. Imagine the extra effort this would take_
 
-## Parsers ##
+## Adding New Parsers ##
 A new parser for a type of playlist files should provide at least two functions:
 - `format_pls`:
 	- Arguments given to a parser are always the same, in the given order:
@@ -66,4 +66,4 @@ A new parser for a type of playlist files should provide at least two functions:
 **Make sure to add these to the module's exported function list**. The parser will be `require`d dynamically so if you don't expose `parser.format_pls`, it can't be used.
 
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
-So long as it translates between mpv's internal playlist objects and the type of playlist it processes, this code is gonna be happy with it.
+So long as it translates between mpv's internal playlist objects and the type of playlist it processes, [this code](./main.lua) is gonna be happy with it.
