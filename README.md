@@ -8,7 +8,7 @@ Then after pondering how to do this, I figured I might as well write some script
 If the script doesn't exist yet, expect a branch to be made soon™. If you have suggestions, feel free to fork or [contact me](#Contact) about it!
 |    Name    |                Description                |
 |------------|-------------------------------------------|
-| yeetpls    | Delete playlist entries after playing them, or the entire playlist file when done |
+| [yeetpls](/yeetpls) | Delete playlist entries after playing them, or the entire playlist file when done |
 
 # Installing #
 For any and all of the scripts, they work as all mpv user scripts work. You put them in the global or user-local scripts directory. Information
@@ -44,7 +44,7 @@ Branches in this repo will be ordered a bit different from most projects because
 - If you wish to contribute to this repo rather than fork, [shoot me a message](#Through-Discord) and we'll see if I can add you;
   - It's advisable to have sent in PRs before you request being added to the repo as a contributor.
   - In some cases of ~~favoritism~~ personal contacts, I'll add people I know and have faith in to write good code.
-- For more info on script collections (for example [`yeetpls`](/yeetpls)), look at the README in the top-level folder.
+- For more info on script collections (for example `yeetpls`), look at the README in the top-level folder.
 
 # Contact #
 ## Through GitHub ##
