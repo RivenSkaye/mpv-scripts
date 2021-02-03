@@ -2,9 +2,7 @@
 -- take the OS-specific paths into account and the accepted ways of matching
 -- files and paths. Which in Windows allows both forward and backward slashes
 -- in most if not all cases.
--- Obviously this means making special cases for Windows. REEE
--- This also means that if you mix-and-match Windows paths and POSIX-compliant
--- paths, the parser will deem your playlist unparsable. Deal with it.
+-- Luckily new patterns have been set up that allow for both, interchangeably
 
 local parser = {}
 local mpv_tbl
@@ -71,9 +69,10 @@ function parser.test_format(pls)
 	for index,entry in ipairs(entries) do
 		if not entry:find("[^%z<>:%|%?%*\"]") then -- This path contains disallowed chars. Win == NIX here, due to effort and media should work everywhere.
 			pass=false
-		elseif not entry:find(fwp) or not entry:find(fnp) or not entry:find(rfp) or not entry:find(jaf) -- check for paths here. If we don't find them...
-			if not entry:find(upe) -- check for URLs. If none:
+		elseif not entry:find(fwp) or not entry:find(fnp) or not entry:find(rfp) or not entry:find(jaf) then -- check for paths here. If we don't find them...
+			if not entry:find(upe) then -- check for URLs. If none:
 				pass=false -- it matches no known inputs
+			end
 		end
 	end
 	return pass -- All entries passed the test, playlist is correct if this is true.
