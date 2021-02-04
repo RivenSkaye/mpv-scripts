@@ -72,28 +72,19 @@ function parser.test_format(pls)
 	local entries = split_entries(pls)
 	local t = {}
 	for index,entry in ipairs(entries) do
-		if not entry:find(illegal) then -- This path contains disallowed chars. Win == NIX here, due to effort. And media should work everywhere.
-			pass=false
-		elseif not entry:find(fwp) or not entry:find(fnp) or not entry:find(rfp) or not entry:find(jaf) then -- check for paths here. If we don't find them...
-			pass=false -- it matches no known inputs
-		end
-	end
-	-- This might just be a legal URL, they have different allowed and illegal chars than files
-	if not pass and not entry:find(url_illegal) then
-		if entry:find(upe) then
-			pass = true
-		end
+		if parser.test_entry(entry) then pass = true end
 	end
 	return pass -- All entries passed the test, playlist is correct if this is true.
 end
 
 --- Special function exposed for other parsers that want to test a single
 -- file name / path / URL rather than the entire playlist
+-- I'm sure it's bugged as hell
 -- @param entry The entry to test
 -- @param[opt="all"] test Type of entry to check, use "all" for unknown.
 -- Valid values are "all", "file", "path", "relative", "url"
 -- @return Whether or not this matches any of the patterns requested.
-function parser.testentry(entry, test)
+function parser.test_entry(entry, test)
 	local types = {
 		file = {jaf},
 		path = {fnp, fwp},
@@ -109,9 +100,8 @@ function parser.testentry(entry, test)
 			-- If we find a match, return true
 			if entry:find(v) then return true end
 		end
+		pass = false -- So far, no match. Prob illegal
 	end
-	-- if we didn't return true yet, assume it's not valid
-	pass = false
 	if not entry:find(url_illegal) then
 		if test == "all" or test == "url" then
 			if entry:find(upe) then
