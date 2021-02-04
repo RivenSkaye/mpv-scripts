@@ -15,7 +15,7 @@ Current behavior is to bypass read check on the file and immediately open it in 
 
 This script assumes that **there is no shuffle applied**. It was made with the intention of automating the entire process from acquiring anime down to watching the show without doing anything
 other than pointing mpv to a playlist. I personally set up a simple script to run on download completion that automatically generates a file `playlist.txt` which is just a list of file names
-in the directory that don't match certain patterns. If you apply shuffle, make sure that the playlist format you use gets processed by a parser that actually filters the entries by comparison.
+in the directory that don't match certain patterns. If you apply shuffle, make sure that the playlist format you use gets processed by a parser that [isn't affected by shuffle](#Supported-Formats).
 The `txt` parser is guaranteed to provide this functionality, because the file format is extremely easy to use and the largest workload is extracting all remaining file names.
 Creating a playlist for it is as easy as redirecting the output of `ls` (or `dir` with the correct flags under Windows) to a text file,
 or just aggregating all full paths for the media you want in it in a single file. One playlist entry per line, as per mpv's plaintext playlist handler.
@@ -70,3 +70,10 @@ Anything else you add to the module's export list will be ignored by `main.lua`.
 
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, [this code](./main.lua) is gonna be happy with it.
+
+## Supported Formats ##
+_Parsers will never remove entries that have not been played. If they're not Shuffle-safe, ouput will be the same as the shuffled playback order for mpv internally._
+| Parser | Formats | Shuffle-safe |
+|--------|---------|--------------|
+| txt-parser | txt, simple m3u. Basically just a list of files.| Yes |
+| pls-parser | pls | Yes |
