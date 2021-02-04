@@ -70,7 +70,6 @@ function parser.test_format(pls)
 	-- Checks all valid chars in file paths. Allows for periods in paths
 	local pass = true
 	local entries = split_entries(pls)
-	local t = {}
 	for index,entry in ipairs(entries) do
 		if parser.test_entry(entry) then pass = true end
 	end
