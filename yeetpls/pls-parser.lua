@@ -11,30 +11,34 @@ parser = {}
 --- Split all entries in the playlist file
 -- Takes into account the optional nature of
 -- the Title and Length headers.
-function split_entries(pls)
+function split_entries(pls_in)
 	-- retain newlines for verification at a later point in time
 	local entryfile = "File%d=.-[\r\n]+"
 	local entrytitle = "Title%d=.-[\r\n]+"
-	local entrylength = "Length%d=%-?%d+[\r\n]+"
+	local entrylength = "Length%d=%-?%d+[\r\n]*" -- Final newline gets stripped in the gsub
 
 	-- Fetch a table of all lines in the file
 	local entries = {}
 	local total_entries = 0
 	-- Remove the header and footer
-	pls = pls:gsub("^%[playlist%][\r\n]-[^\r\n]"):gsub("[\r\n]+NumberOfEntries=%d+[\r\n]+Version=2[\r\n]*")
+	pls = pls_in:gsub("^%[playlist%][\r\n]+", ""):gsub("[\r\n]+NumberOfEntries=%d+[\r\n]+Version=2[\r\n]*", "")
 	-- Find a way to split on any combination of the above patterns
 	-- gmatch every pattern, get the entry number and use that to get it in the table
 	for match in pls:gmatch(entryfile) do
-		local number = tonumber(pls:match("File%d+"):match("%d+"))
+		local number = tonumber(match:match("%d+"))
 		entries[number] = match -- This is just the seed, hence why we can't concat it yet
 		total_entries = total_entries + 1
+		filename = match:gsub("File%d=", ""):gsub("[\r\n]+", "")
+		if not txt_base.test_entry(filename) then
+			return false
+		end
 	end
 	for match in pls:gmatch(entrytitle) do
-		local number = tonumber(pls:match("Title%d+"):match("%d+"))
+		local number = tonumber(match:match("%d+"))
 		entries[number] = entries[number]..match -- This is just the seed, hence why we can't concat it yet
 	end
 	for match in pls:gmatch(entrylength) do
-		local number = tonumber(pls:match("Length%d+"):match("%d+"))
+		local number = tonumber(match:match("%d+"))
 		entries[number] = entries[number]..match -- This is just the seed, hence why we can't concat it yet
 	end
 	return entries, total_entries
@@ -50,7 +54,7 @@ function verify_header(pls)
 	local count = 0
 	local pls_lines = txt_base.split_entries(pls)
 	for _,line in ipairs(pls_lines) do
-		if pls:find(header) then
+		if line:find(header) then
 			count = count + 1
 		end
 	end
@@ -86,10 +90,40 @@ function parser.test_format(pls)
 	local footer_pass, footer = verify_footer(pls, total)
 	if footer_pass and header_pass then
 		local reconstruct = header..table.concat(content, "")..footer
-		if reconstruct == pls then -- Not stripping any newlines and other data should mean they're equal
+		if reconstruct == pls then -- Not stripping any legal data should mean they're equal
 			return true
 		else
 			return false
 		end
 	end
 end
+
+function in_mpv(mpv_tbl, search)
+	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+		for k,v in pairs(e) do -- for key, value in index
+			if k:lower() ~= "playing" and k:lower() ~= "current" then
+				if search == v then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
+function parser.format_pls(pls_in, mpv_pls)
+	local header = "[playlist]\n"
+	local footer = "\nNumberOfEntries=XXX\nVersion=2\n"
+	local remaining = 0
+	local pls_tbl, total_in = split_entries(pls_in)
+	local pls_out = {}
+	for i,v in pls_tbl do
+		local search = v:gsub("File%d=", ""):gsub("[\r\n].*", "")
+		if in_mpv(mpv_pls, search) then
+			remaining = remaining + 1
+			table.insert(pls_out, v)
+		end
+	end
+end
+
+return parser
