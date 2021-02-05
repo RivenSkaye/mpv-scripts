@@ -107,6 +107,7 @@ end
 if options.makeConfig == "yes" then
 	-- create the config file and alert the user
 	local config_file = mp.get_script_directory():gsub("scripts[/|\\].*", "script-opts/yeetpls.conf")
+	local o = {}
 	if mp.get_property_native('options/vo-mmcss-profile', o) ~= o then
 		config_file = config_file:gsub("/", "\\")
 	end
