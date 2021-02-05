@@ -8,7 +8,7 @@ Then after pondering how to do this, I figured I might as well write some script
 If the script doesn't exist yet, expect a branch to be made soon™. If you have suggestions, feel free to fork or [contact me](#Contact) about it!
 |    Name    |                Description                |
 |------------|-------------------------------------------|
-| yeetpls    | Delete playlist entries after playing them, or the entire playlist file when done |
+| [yeetpls](/yeetpls) | Delete playlist entries after playing them, or the entire playlist file when done |
 
 # Installing #
 For any and all of the scripts, they work as all mpv user scripts work. You put them in the global or user-local scripts directory. Information
@@ -31,14 +31,20 @@ throw errors. And that gives you those scary red messages on the CLI that make y
 Branches in this repo will be ordered a bit different from most projects because I want to make contributing easy for all. And since this repo is supposed to be a collection, we don't want to accidentally push changes to an unstable file when another one has a stable update.
 
 `master` is the classical branch for the stable versions of the script. Shouldn't change unless working updates are made. What's in here can be downloaded safely. Then there's the matter of adding new scripts or changing existing ones. This should be done by creating a branch named after the script. A few simple rules for both:
-- Branch and Script names will be all lower case, with dashes or underscores to separate words;
-- The choice between a dash or underscore is a free choice for whomever makes it; (both `yeet-pls` and `yeet_pls` are valid)
+- Branch names will be all lower case, with underscores to separate words.
+- Script names will be in camelCase, or as a single string.
+  - Both `yeetpls` and `yeetPls` are valid;
+  - `yeetpls` is preferred for ease of use on the CLI
+  - Reflect this in the branch name using underscores
+  - Use camelCase only if it's an important distinction to be made
+    - expertsexchange is somewhat ambiguous, expertsExchange is not.
 - Changes to a script should **only** be made in the branch of the same name;
 - If a branch doesn't exist, create it;
 - If a script is deemed stable and complete, the branch will be deleted after 9 weeks of inactivity;
 - If you wish to contribute to this repo rather than fork, [shoot me a message](#Through-Discord) and we'll see if I can add you;
   - It's advisable to have sent in PRs before you request being added to the repo as a contributor.
-  - In some cases of ~~favoritism~~ personal contacts, I'll add people I know and have faith in to write good code
+  - In some cases of ~~favoritism~~ personal contacts, I'll add people I know and have faith in to write good code.
+- For more info on script collections (for example `yeetpls`), look at the README in the top-level folder.
 
 # Contact #
 ## Through GitHub ##
