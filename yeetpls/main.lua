@@ -97,6 +97,9 @@ else
 		mp.commandv('loadlist', options.playlist, 'append')
 		-- make seure we get a correct count now
 		mpv_pls = mp.get_property_native("playlist") -- Array of objects => indexed table of tables. [{"filename", <file path>}...]
+	else
+		msg.warn("There are already files being played by mpv, this means playlist integrity cannot be guaranteed. Exiting...")
+		return
 	end
 end
 -- If and only if we're successful, create the config file if it doesn't exist yet
