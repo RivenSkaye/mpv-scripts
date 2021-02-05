@@ -62,7 +62,7 @@ A new parser for a type of playlist files should provide at least two functions:
 		- This fallback may or may not break the entire input file, I might change this behavior later.
 
 **Make sure to add these to the module's exported function list**. The parser will be `require`d as `parser=require(type.."-parser")`, so if you don't expose `parser.format_pls`, it can't be used.
-Anything else you add to the module's export list will be ignored by `main.lua`.
+Anything else you add to the module's export list will be ignored by `main.lua`, but can be used by other parsers. Feel free to export any useful code.
 
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, [this code](./main.lua) is gonna be happy with it.
