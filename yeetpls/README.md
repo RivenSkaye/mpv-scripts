@@ -20,8 +20,6 @@ The `txt` parser is guaranteed to provide this functionality, because the file f
 Creating a playlist for it is as easy as redirecting the output of `ls` (or `dir` with the correct flags under Windows) to a text file,
 or just aggregating all full paths for the media you want in it in a single file. One playlist entry per line, as per mpv's plaintext playlist handler.
 
-~~the `txt` parser is also the only one guaranteed to actually exist. I'm lazy and if it works for _me_, I'm usually happy~~
-
 ## Known issues ##
 ### Specifying the playlist twice ###
 Currently, due to a limitation of mpv, the script is unable to fetch the playlist file provided with the `--playlist` command line option. Because it's not good practice to gamble on how
