@@ -26,11 +26,9 @@ Currently, due to a limitation of mpv, the script is unable to fetch the playlis
 a playlist file gets provided, the script currently requires a user to set a script-opt instead. The script-opt to be set is `yeetpls-playlist`, as per the standard outlined on mpv.io to
 automatically look for any script-opt named {script_name}-{opt_name}.
 
-Yes, this means specifying the file twice, or setting `--idle=[once | yes]`. Don't complain to me about this, I'm just the messenger. I already sent in a [feature request](https://github.com/mpv-player/mpv/issues/8508)
-to fix this, including all information I could get my hands on in regards to getting the playlist files. Someone suggested a possible fix on init time, but it doesn't work with the `--playlist` option.
+Yes, this means setting `--idle=[once | yes]` and a script-opt. Don't complain to me about this, I'm just the messenger. I already sent in a [feature request](https://github.com/mpv-player/mpv/issues/8508)
+to fix this, including all information I could get my hands on in regards to getting the playlist files.
 Feel free to suggest other ways of attempting to get the file though!
-_Behavior for this problem might change to instead attempt to load the playlist from just the script-opt and having the user add the flag to not close on idling. This remains to be seen as it changes
-the requirements to parsers as well, to read playlists on start and parse them to a table instead of just the other way around. Imagine the extra effort this would take_
 
 ## Adding New Parsers ##
 A new parser for a type of playlist files should provide at least two functions:
