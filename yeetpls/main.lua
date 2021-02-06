@@ -8,6 +8,7 @@ local parser_name = nil -- This value is only used when stuff errors
 local pls_old = nil -- The old playlist file's content
 local mpv_pls = nil -- populated internally with mpv's playlist
 local script_dir = nil
+local no_print = false
 local options = {
 	makeConfig = "yes",
 	-- whether or not to auto-delete playlist entries after playing them
@@ -66,6 +67,7 @@ function base_init()
 		pls_file,err,errcode = io.open(options.playlist, "r")
 		if err then
 			msg.error("File '"..options.playlist.."' does not exist and createFile script-opt was not set to 'yes'. Exiting...")
+			no_print = true
 			return false
 		end
 		pls_file:close()
@@ -91,7 +93,9 @@ if options.playlist == "None" or options.exit == "yes" then -- exit since we're 
 	return
 else
 	if not base_init() then -- something caused a failure, exit.
-		msg.error(parser_name.." was unable to parse this playlist type ("..filetype.."). Exiting...")
+		if not no_print then -- quick hack to see if it was a nu_file issue
+			msg.error(parser_name.." was unable to parse this playlist type ("..filetype.."). Exiting...")
+		end
 		return
 	elseif #mpv_pls == 0 then -- a playlist file wasn't loaded, so it's empty and idle
 		mp.commandv('loadlist', options.playlist, 'append')
