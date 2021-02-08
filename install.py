@@ -1,45 +1,41 @@
-"""Installs the yeetpls mpv Lua script
+"""Interactive installer for Riven's mpv scripts
 
-Fetches the required files, outputs them to the correct directory and makes
-sure that the OS can handle them. Makes some proper differentiations regarding
-the OS, assuming it's run in the normal way. If anything seems off, cancel
-this hunk-a-junk and just manually supply the directory you want the script in
-using `python install.py -scripts "$HOME/.config/mpv/scripts/"`
+This interactive installer makes sure to fetch data about the available scripts
+in the 'master' branch of the git repository. It then proceeds to offer users
+the option to install or update any of the provided scripts in either the
+default user folders for mpv, or a folder of their own choosing.
 
-I don't know and much less care to test what ~ does when used as input.
-I prefer exact paths and have some notion of how variables can be resolved,
-but by no means do I like doing what a decent user can tell their shell to do.
+It fetches the information of installed scripts on every start of the script
+and only removes entries after installing. This means it may very well list
+scripts that are already installed and up-to-date.
+Changing this would require changing the behavior of the application and saving
+data on the local machine, which is not worth it in my opinion.
 
 Author: RivenSkaye
 """
 import urllib.request as req
-import sys
+import json
+import os
 import platform
 from pathlib import Path
-import os
 
-# Lazy as hell, time to shorten this
-argv = sys.argv
-# Any of the help options found? Print help and exit, ignore the rest
-helps = ['-h', '-help', '--h', '--help']
-if any([h == a for h in helps for a in argv]) or len(argv) <= 1:
-    print("Installs the yeetpls user script for mpv. Valid options are:")
-    print("-default\t\tUses the default user-based scripts dir for this user. If this is supplied, specified folders get ignored.")
-    print("-scripts <path/to/scripts/folder>\tSpecify a folder.")
-    print("-h, -help, --h, --help\tSummons this message and exits. If this is present, all other options will be ignored.")
-    print("Please do not input any environment variables other than '~' on Linux/Unix-like machines and '%APPDATA%' on Windows machines.")
-    print("The script only handles these because they're listed in the default paths for mpv to store files, and are thus used internally.")
-    print("If you know what you're doing, feel free to substitute them into the parameters.")
-    print("If your path happens to have spaces, make sure it's properly enclosed/escaped for your OS")
-    exit(0)
-# No help, time to welcome the user
-print("Welcome to the yeetpls installer!\nIf you set the '-scripts' flag to a path, we'll download the files there.\nIf you used -default, we'll put them in the usual places.")
-print("Naturally, we'll check if we got the right place.")
-opts = {'scripts': None}
-# Is the default flag set? We'll need this later
-default = False
-# Guess what OS has been causing trouble. Again. -_-'
-windows = False
+print("Welcome to Riven's interactive installer!")
+
+# Guess what OS is causing trouble. Again... -_-'
+windows = True if platform.system().lower() == "windows" else False
+def_path;
+if windows:
+    print("I've determined you are on a Windows machine. If this is not the case, something is wrong and you'll have to download the scripts manually.")
+    def_path = "%APPDATA%\\mpv\\scripts\\"
+else:
+    print("I've determined you're on a UNIX-like OS. Thanks for making a somewhat sane decision.")
+    def_path = "~.config/mpv/scripts/"
+print("Please give me a moment to fetch a list of available scripts. This process is faster on faster internet connections.")
+# Base URL so we only need to append file and folder names
+base_url = "https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/master/"
+filelist = json.loads(req.urlopen(f"{base_url}scripts.json").read().decode(response.headers.get_content_charset()).replace("\r\n", "\n"))
+
+
 
 # Either pick default or the supplied folder. On user error, fuck the user.
 if "-default" in argv: # User chose default dirs
@@ -54,15 +50,6 @@ else:
         default = True
     else:
         opts['scripts'] = given
-
-if platform.system().lower() == "windows":
-    windows = True
-
-if default and not opts['scripts']:
-    if windows:
-        opts['scripts'] = r"%APPDATA%/mpv/scripts/"
-    else:
-        opts['scripts'] = "~/.config/mpv/scripts/"
 
 if not opts['scripts'].endswith("/"):
     opts['scripts'] += "/"
@@ -85,9 +72,6 @@ if not confirmation.lower() == "y":
 
 # Create any missing directories
 Path(opts['scripts']).mkdir(parents=True, exist_ok=True)
-
-# Base URL so we only need to append file names. We'll use str.format in a loop for this
-base_url = "https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/master/yeetpls/{}"
 
 # Get the filelist off git
 response = req.urlopen(base_url.format("filelist.txt"))

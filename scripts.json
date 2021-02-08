@@ -1,0 +1,8 @@
+{
+	"yeetpls": {
+		"multifile": true
+		"base_url": "https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/master/yeetpls/"
+		"required": ["main.lua", "txt-parser.lua"],
+		"optional": ["pls-parser.lua"]
+	}
+}
