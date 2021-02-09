@@ -33,33 +33,36 @@ Feel free to suggest other ways of attempting to get the file though!
 ## Adding New Parsers ##
 A new parser for a type of playlist files should provide at least two functions:
 - `format_pls`:
-	- Arguments given to a parser are always the same, in the given order:
-		- The playlist as read from the file, as a string.
-			- This is the _original file_ and entries have **not yet been removed**.
-		- The `playlist` object as returned by mpv's `mp.get_property_native("playlist")`.
-			- In Lua, this becomes an indexed table of tables:
-			- Top level: `ipair`s of a number and a table to determine the order;
-			- Inner table: `pair`s of Stream Type (string) and the actual URL.
-	- The value returned should be a string that can be written to a playlist file, according to the playlist spec.
+  - Arguments given to a parser are always the same, in the given order:
+    - The playlist as read from the file, as a string.
+      - This is the _original file_ and entries have **not yet been removed**.
+    - The `playlist` object as returned by mpv's `mp.get_property_native("playlist")`.
+      - In Lua, this becomes an indexed table of tables:
+      - Top level: `ipair`s of a number and a table to determine the order;
+      - Inner table: `pair`s of Stream Type (string) and the actual URL.
+  - The value returned should be a string that can be written to a playlist file, according to the playlist spec.
 - `test_format`:
-	- Argument given for this function is always just the content of the file.
-	- The value returned should be a Boolean.
-	- If multiple format specs allow for the same parser to be used (m3u/m3u8 for example), an extra step is required:
-		- Mention this in any PR to add functionality
-		- Provide a list of all formats that match
-		- Explain _why_ this shouldn't be a separate parser. Following m3u8 example: does mpv handle the charset internally?
-		- This will probably end up with a translation table of `format, parser` where there will be duplicate entries in the parser field
-			- Feel free to suggest a better fix :^)
-	- Provide an internal way of matching the spec
-	- Try to also match the current file content
-		- Examples include not adding optional fields that the file currently doesn't use
-		- Not dropping fields that could fairly easily be implemented
-		- If a file takes note of URL/local file/webstream, please try to match this in the output
-	- Do not throw errors if a file is a mismatch to the spec
-		- Use one of the `mp.msg` functions to notify the user of this.
-		- Optionally print a single line message on the OSD
-		- `return false` makes main.lua attempt to use a fallback, if that fails it provides a clean exit.
-		- This fallback may or may not break the entire input file, I might change this behavior later.
+  - Argument given for this function is always just the content of the file.
+  - The value returned should be a Boolean.
+  - If multiple format specs allow for the same parser to be used (m3u/m3u8 for example), an extra step is required:
+    - Mention this in any PR to add functionality
+    - Provide a list of all formats that match
+    - Explain _why_ this shouldn't be a separate parser. Following m3u8 example: does mpv handle the charset internally?
+    - This will probably end up with a translation table of `format, parser` where there will be duplicate entries in the parser field
+      - This is currently implemented in `main.lua`, line 36 and on.
+      - For now, please make sure to only add parsers that work for multiple types of files, follow the m3u scheme.
+      - If a parser only applies to one playlist type, there's no need to add it. The proper checks are in place.
+      - Feel free to suggest a better fix :^)
+  - Provide an internal way of matching the spec
+  - Try to also match the current file content
+    - Examples include not adding optional fields that the file currently doesn't use
+    - Not dropping fields that could fairly easily be implemented
+    - If a file takes note of URL/local file/webstream, please try to match this in the output
+  - Do not throw errors if a file is a mismatch to the spec
+    - Use one of the `mp.msg` functions to notify the user of this.
+    - Optionally print a single line message on the OSD
+    - `return false` makes main.lua attempt to use a fallback, if that fails it provides a clean exit.
+    - This fallback may or may not break the entire input file, I might change this behavior later.
 
 **Make sure to add these to the module's exported function list**. The parser will be `require`d as `parser=require(type.."-parser")`, so if you don't expose `parser.format_pls`, it can't be used.
 Anything else you add to the module's export list will be ignored by `main.lua`, but can be used by other parsers. Feel free to export any useful code.
