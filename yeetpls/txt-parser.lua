@@ -60,7 +60,7 @@ local fnp = "/[.-/]*.+%.%w+" -- full *NIX path
 local rfp = "[%.+\\/]?[.-\\/]*.+%.%w+" -- relative file path
 local jaf = ".+%.%w+" -- Just a file
 -- URIs have different legal and illegal characters. Anything not in the following list is never legal in a URI
-local url_illegal = "[^%w%-%.%_%~%:%/%?%#%[%]%@%!%$%&%'%(%)%*%+%,%;%=%%]"
+local url_illegal = "[^%w%-%.%_%~%:%/%?%#%[%]%@%!%$%&%'%(%)%*%+%,%;%=%%]" -- the caret (^) denotes anything not in this list
 local upe = "%a+://[.+%.]?%w+%.%w+[/.]*" -- URL playlist entry
 -- Test if the input format matches the expected input and return a Boolean.
 -- Do this however seems most fit for the parser you wrote.
