@@ -17,7 +17,7 @@ function split_entries(pls_in)
 	local entrytitle = "Title%d=.-[\r\n]+"
 	local entrylength = "Length%d=%-?%d+[\r\n]*" -- Final newline gets stripped in the gsub
 
-	-- Fetch a table of all lines in the file
+	-- Make a table for all entries in the file
 	local entries = {}
 	local total_entries = 0
 	-- Remove the header and footer
