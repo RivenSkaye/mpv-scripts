@@ -33,10 +33,16 @@ opts.read_options(options, "yeetpls")
 
 -- Basic initialization. Wrapped in a function so we can properly exit the script if anything fails
 function base_init()
+	local typetranslation = {
+		m3u8 = "m3u", -- No need to add m3u, since it translates to that ...
+	}
 	if options.playlistType == "auto" then -- Determine the type of playlist, this is based on the extension
-		filetype = options.playlist:reverse():match('.*%p'):reverse():sub(2)
+		filetype = options.playlist:reverse():match('.*%p'):reverse():sub(2):lower()
+		if typetranslation[filetype] ~= nil then -- ... So the key m3u would evaluate to nil ...
+			filetype = typetranslation[filetype]
+		end
 		msg.info("Reading playlist of type "..filetype)
-		options.playlistType = filetype
+		options.playlistType = filetype -- .. And this would still be m3u
 		-- More than willing to accept PRs that add tables to map extensions to playlist types,
 		-- in order to allow one parser to be used with any legal file type extension
 	else
