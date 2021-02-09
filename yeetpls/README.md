@@ -67,9 +67,11 @@ Anything else you add to the module's export list will be ignored by `main.lua`,
 Whatever else these parsers do internally is irrelevant, make them perform black magic for all I care.
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, [this code](./main.lua) is gonna be happy with it.
 
-## Supported Formats ##
+## Available parsers ##
 _Parsers will never remove entries that have not been played. If they're not Shuffle-safe, ouput will be the same as the shuffled playback order for mpv internally._
-| Parser | Formats | Shuffle-safe |
-|--------|---------|--------------|
-| txt-parser | txt, simple m3u. Basically just a list of files.| Yes |
-| pls-parser | pls | Yes |
+
+The 'Required' header informs you if a file is a hard requirement for using the script at all. The optional files extend functionality for this module.
+| Parser | Formats | Shuffle-safe | Required |
+|--------|---------|--------------|----------|
+| txt-parser | txt, simple m3u. Basically just a list of files.| Yes | Yes |
+| pls-parser | pls | Yes | No |
