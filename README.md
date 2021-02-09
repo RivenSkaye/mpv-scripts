@@ -30,7 +30,9 @@ throw errors. And that gives you those scary red messages on the CLI that make y
 # Contributing #
 Branches in this repo will be ordered a bit different from most projects because I want to make contributing easy for all. And since this repo is supposed to be a collection, we don't want to accidentally push changes to an unstable file when another one has a stable update.
 
-`master` is the classical branch for the stable versions of the script. Shouldn't change unless working updates are made. What's in here can be downloaded safely. Then there's the matter of adding new scripts or changing existing ones. This should be done by creating a branch named after the script. A few simple rules for both:
+`master` is the classical branch for the stable versions of the script. Shouldn't change unless working updates are made.
+What's in here can be downloaded safely. Then there's the matter of adding new scripts or changing existing ones.
+This should be done by creating a branch named after the script. A few simple rules for both:
 - Branch names will be all lower case, with underscores to separate words.
 - Script names will be in camelCase, or as a single string.
   - Both `yeetpls` and `yeetPls` are valid;
@@ -39,12 +41,30 @@ Branches in this repo will be ordered a bit different from most projects because
   - Use camelCase only if it's an important distinction to be made
     - expertsexchange is somewhat ambiguous, expertsExchange is not.
 - Changes to a script should **only** be made in the branch of the same name;
-- If a branch doesn't exist, create it;
-- If a script is deemed stable and complete, the branch will be deleted after 9 weeks of inactivity;
+- If a branch doesn't exist, [ask me](#Contact) to create it;
+  - If you have results for passing tests, feel free to PR to master
+  - If you're added to the repo, create it yourself
+- If a script is deemed stable and complete, the branch will be deleted after __9 weeks__ of inactivity;
 - If you wish to contribute to this repo rather than fork, [shoot me a message](#Through-Discord) and we'll see if I can add you;
   - It's advisable to have sent in PRs before you request being added to the repo as a contributor.
   - In some cases of ~~favoritism~~ personal contacts, I'll add people I know and have faith in to write good code.
-- For more info on script collections (for example `yeetpls`), look at the README in the top-level folder.
+- For more info on script modules (for example `yeetpls`), look at the README in the top-level folder.
+  - It is not required to add a README for a module
+  - It is advisable to add one if there are instructions or extra info for the script
+  - If you add one, make sure to **list what files are required or optional**
+- Make sure to include the addition to `scripts.json` in the specified format;
+  - For single-file scripts:
+    - Set `multifile` to `false`
+    - Set the `base_url` to `https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/master/` (include the trailing /)
+    - Set `required` to an array containing only the script file
+    - Set `optional` to an empty array
+  - For multi-file scripts:
+    - Set `multifile` to `true`
+    - Set the `base_url` to `https://raw.githubusercontent.com/RivenSkaye/mpv-scripts/master/<script_name>/` (include the trailing /)
+    - Set `required` to an array containing at least the `main.<ext>` file (valid extensions are listed in [the mpv docs](https://mpv.io/manual/master/))
+    - Set `optional` to an array containing all files not required for operation, or empty if they're all required
+  - Make sure the JSON is still valid. I will check this, but even I miss or forget commas sometimes.
+    - It's recommended to run the installer script locally and having it put the scripts in a non-standard directory
 
 # Contact #
 ## Through GitHub ##
