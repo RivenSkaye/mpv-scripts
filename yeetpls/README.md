@@ -10,14 +10,15 @@ This script does not care about where it's being run from. So long as mpv can re
 Due to a [limitation in mpv](#Known-Issues), you must pass the playlist file to `--script-ops=yeetpls-playlist=<file>`. Thanks to the `loadlist` internal input command, this script can **replace**
 the need for an input file or the use of the `--playlist` option. My own command is usually `mpv --idle=once --script-opts=yeetpls-playlist=playlist.txt`. Setting `idle=once` (or `yes`) is a hard
 requirement here, because mpv will **__NOT__** init any scripts if it's not allowed to idle. You could also set this option in your mpv.conf so that `--idle=once` is always applied.
-Optionally also pass the script-opt `create_file=true` if it doesn't exist and you want it to be made. _If it doesn't exist and you don't pass this option, it **will** error and exit._
+Optionally also pass the script-opt `create_file=true` if it doesn't exist and you want it to be made. This option only works with some parsers, [check the table](#Supported-Formats).
+_If it doesn't exist and you don't pass this option, it **will** error and exit._
 Current behavior is to bypass read check on the file and immediately open it in `a+` for reading, appending and creating.
 
 This script assumes that **there is no shuffle applied**. It was made with the intention of automating the entire process from acquiring anime down to watching the show without doing anything
 other than pointing mpv to a playlist. I personally set up a simple script to run on download completion that automatically generates a file `playlist.txt` which is just a list of file names
 in the directory that don't match certain patterns. If you apply shuffle, make sure that the playlist format you use gets processed by a parser that [isn't affected by shuffle](#Supported-Formats).
 The `txt` parser is guaranteed to provide this functionality, because the file format is extremely easy to use and the largest workload is extracting all remaining file names.
-Creating a playlist for it is as easy as redirecting the output of `ls` (or `dir` with the correct flags under Windows) to a text file,
+Creating a playlist for it is as easy as redirecting the output of `ls -1` (or `dir` with the correct flags under Windows) to a text file,
 or just aggregating all full paths for the media you want in it in a single file. One playlist entry per line, as per mpv's plaintext playlist handler.
 
 ## Known issues ##
@@ -71,10 +72,12 @@ Whatever else these parsers do internally is irrelevant, make them perform black
 So long as it translates between mpv's internal playlist objects and the type of playlist it processes, [this code](./main.lua) is gonna be happy with it.
 
 ## Available parsers ##
-_Parsers will never remove entries that have not been played. If they're not Shuffle-safe, ouput will be the same as the shuffled playback order for mpv internally._
-
-The 'Required' header informs you if a file is a hard requirement for using the script at all. The optional files extend functionality for this module.
-| Parser | Formats | Shuffle-safe | Required |
-|--------|---------|--------------|----------|
-| txt-parser | txt, simple m3u. Basically just a list of files.| Yes | Yes |
-| pls-parser | pls | Yes | No |
+_Parsers will never remove entries that have not been played._
+- The 'Required' header informs you if a file is a hard requirement for using the script at all. The optional files extend functionality for this module.
+- The 'Shuffle-safe' header denotes if shuffling in mpv affects the playlist file. If this says no, shuffle changes the order in the output.
+- The 'Create' header informs you if a parser can be used to create new files. Use createFile at your own risk with these.
+| Parser | Formats | Required | Shuffle-safe | Create |
+|--------|---------|--------------|----------|--------|
+| txt-parser | txt, simple m3u. Basically just a list of files.| Yes | Yes | Yes |
+| pls-parser | pls | No | Yes | No |
+| m3u-parser | m3u(8), Extended m3u(8) | No | Yes | Yes (simple m3u) |
