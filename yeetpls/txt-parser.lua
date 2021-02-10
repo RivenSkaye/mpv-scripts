@@ -62,20 +62,6 @@ local jaf = ".+%.%w+" -- Just a file
 -- URIs have different legal and illegal characters. Anything not in the following list is never legal in a URI
 local url_illegal = "[^%w%-%.%_%~%:%/%?%#%[%]%@%!%$%&%'%(%)%*%+%,%;%=%%]" -- the caret (^) denotes anything not in this list
 local upe = "%a+://[.+%.]?%w+%.%w+[/.]*" -- URL playlist entry
--- Test if the input format matches the expected input and return a Boolean.
--- Do this however seems most fit for the parser you wrote.
--- In practice, the only cgar that is truly illegal to add to a URI is NULL.
--- The pain of patterns drove me to this point of "fuck it". Let mpv error if a name is borked instead.
-function parser.test_format(pls)
-	-- empty string, this can only happen when createFile is true
-	if pls == "" then return true end
-	-- Checks all valid chars in file paths. Allows for periods in paths
-	local entries = split_entries(pls)
-	for index,entry in ipairs(entries) do
-		if not parser.test_entry(entry) then return false end
-	end
-	return true -- All entries passed the test, playlist is correct if this is true.
-end
 
 --- Special function exposed for other parsers that want to test a single
 -- file name / path / URL rather than the entire playlist
@@ -112,6 +98,21 @@ function parser.test_entry(entry, test)
 	end
 	-- if all tests fail:
 	return pass
+end
+
+-- Test if the input format matches the expected input and return a Boolean.
+-- Do this however seems most fit for the parser you wrote.
+-- In practice, the only cgar that is truly illegal to add to a URI is NULL.
+-- The pain of patterns drove me to this point of "fuck it". Let mpv error if a name is borked instead.
+function parser.test_format(pls)
+	-- empty string, this can only happen when createFile is true
+	if pls == "" then return true end
+	-- Checks all valid chars in file paths. Allows for periods in paths
+	local entries = split_entries(pls)
+	for index,entry in ipairs(entries) do
+		if not parser.test_entry(entry) then return false end
+	end
+	return true -- All entries passed the test, playlist is correct if this is true.
 end
 
 -- Return the module for use in main.lua
