@@ -75,7 +75,7 @@ So long as it translates between mpv's internal playlist objects and the type of
 _Parsers will never remove entries that have not been played._
 - The 'Required' header informs you if a file is a hard requirement for using the script at all. The optional files extend functionality for this module.
 - The 'Shuffle-safe' header denotes if shuffling in mpv affects the playlist file. If this says no, shuffle changes the order in the output.
-- The 'Create' header informs you if a parser can be used to create new files. Use createFile at your own risk with these.
+- The 'Create' header informs you if a parser can be used to create new files. Use createFile at your own risk if it says no.
 | Parser | Formats | Required | Shuffle-safe | Create |
 |--------|---------|--------------|----------|--------|
 | txt-parser | txt, simple m3u. Basically just a list of files.| Yes | Yes | Yes |
