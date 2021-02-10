@@ -8,6 +8,19 @@
 txt_base = require("txt-parser")
 parser = {}
 
+function in_mpv(mpv_tbl, search)
+	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+		for k,v in pairs(e) do -- for key, value in index
+			if k:lower() ~= "playing" and k:lower() ~= "current" then
+				if search == v then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
 --- Split all entries in the playlist file
 -- Takes into account the optional nature of
 -- the Title and Length headers.
@@ -96,19 +109,6 @@ function parser.test_format(pls)
 			return true
 		else
 			return false
-		end
-	end
-	return false
-end
-
-function in_mpv(mpv_tbl, search)
-	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
-		for k,v in pairs(e) do -- for key, value in index
-			if k:lower() ~= "playing" and k:lower() ~= "current" then
-				if search == v then
-					return true
-				end
-			end
 		end
 	end
 	return false
