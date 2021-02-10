@@ -37,7 +37,7 @@ end
 function parser.format_pls(pls_in, mpv_pls)
 	-- Split the entries by newlines, these can be '\r', '\n' or '\r\n'
 	local pls_tbl = {}
-	for str in pls_in:gmatch("[^\r\n|^\r|^\n]+") do -- Not sure the pipes hold any special meaning, but it works on Windows at least
+	for str in pls_in:gmatch("[^\r\n]+") do -- Not sure the pipes hold any special meaning, but it works on Windows at least
 		table.insert(pls_tbl, str)
 	end
 	mpv_tbl = mpv_pls
@@ -68,12 +68,11 @@ local upe = "%a+://[.+%.]?%w+%.%w+[/.]*" -- URL playlist entry
 -- The pain of patterns drove me to this point of "fuck it". Let mpv error if a name is borked instead.
 function parser.test_format(pls)
 	-- Checks all valid chars in file paths. Allows for periods in paths
-	local pass = true
 	local entries = split_entries(pls)
 	for index,entry in ipairs(entries) do
-		if parser.test_entry(entry) then pass = true end
+		if not parser.test_entry(entry) then return false end
 	end
-	return pass -- All entries passed the test, playlist is correct if this is true.
+	return true -- All entries passed the test, playlist is correct if this is true.
 end
 
 --- Special function exposed for other parsers that want to test a single
