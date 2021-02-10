@@ -33,10 +33,16 @@ opts.read_options(options, "yeetpls")
 
 -- Basic initialization. Wrapped in a function so we can properly exit the script if anything fails
 function base_init()
+	local typetranslation = {
+		m3u8 = "m3u", -- No need to add m3u, since it translates to that ...
+	}
 	if options.playlistType == "auto" then -- Determine the type of playlist, this is based on the extension
-		filetype = options.playlist:reverse():match('.*%p'):reverse():sub(2)
+		filetype = options.playlist:reverse():match('.*%p'):reverse():sub(2):lower()
+		if typetranslation[filetype] ~= nil then -- ... So the key m3u would evaluate to nil ...
+			filetype = typetranslation[filetype]
+		end
 		msg.info("Reading playlist of type "..filetype)
-		options.playlistType = filetype
+		options.playlistType = filetype -- .. And this would still be m3u
 		-- More than willing to accept PRs that add tables to map extensions to playlist types,
 		-- in order to allow one parser to be used with any legal file type extension
 	else
@@ -171,6 +177,16 @@ function finalize(event)
 			return
 		end
 		local write_data = parser.format_pls(pls_old, mpv_pls)
+		local o = {}
+		if mp.get_property_native('options/vo-mmcss-profile', o) ~= o then
+			-- Make sure all newlines are okay on Windows
+			-- Input might have \r\n, or it may have \n. So we take two steps:
+			-- Replace every \n with \r\n, this causes any \r\n to become \r\r\n
+			-- Then we replace every \r\r with \r so it's \r\n again
+			write_data = write_data:gsub("\n", "\r\n"):gsub("\r\r", "\r")
+		else
+			write_data = write_data:gsub("\r", "") -- And we might as well shave off \r otherwise
+		end
 		pls_file:write(write_data) -- It doesn't matter to mpv if there's a newline at the end
 	end
 	mp.unregister_event(pls_remove)

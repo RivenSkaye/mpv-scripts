@@ -8,6 +8,19 @@
 txt_base = require("txt-parser")
 parser = {}
 
+function in_mpv(mpv_tbl, search)
+	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+		for k,v in pairs(e) do -- for key, value in index
+			if k:lower() ~= "playing" and k:lower() ~= "current" then
+				if search == v then
+					return true
+				end
+			end
+		end
+	end
+	return false
+end
+
 --- Split all entries in the playlist file
 -- Takes into account the optional nature of
 -- the Title and Length headers.
@@ -17,7 +30,7 @@ function split_entries(pls_in)
 	local entrytitle = "Title%d=.-[\r\n]+"
 	local entrylength = "Length%d=%-?%d+[\r\n]*" -- Final newline gets stripped in the gsub
 
-	-- Fetch a table of all lines in the file
+	-- Make a table for all entries in the file
 	local entries = {}
 	local total_entries = 0
 	-- Remove the header and footer
@@ -87,6 +100,8 @@ end
 function parser.test_format(pls)
 	local header_pass, header = verify_header(pls)
 	local content, total = split_entries(pls)
+	-- if split_entries finds illegal values, it returns false
+	if not content then return false end
 	local footer_pass, footer = verify_footer(pls, total)
 	if footer_pass and header_pass then
 		local reconstruct = header..table.concat(content, "")..footer
@@ -94,18 +109,6 @@ function parser.test_format(pls)
 			return true
 		else
 			return false
-		end
-	end
-end
-
-function in_mpv(mpv_tbl, search)
-	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
-		for k,v in pairs(e) do -- for key, value in index
-			if k:lower() ~= "playing" and k:lower() ~= "current" then
-				if search == v then
-					return true
-				end
-			end
 		end
 	end
 	return false
@@ -117,13 +120,15 @@ function parser.format_pls(pls_in, mpv_pls)
 	local remaining = 0
 	local pls_tbl, total_in = split_entries(pls_in)
 	local pls_out = {}
-	for i,v in pls_tbl do
+	for i,v in ipairs(pls_tbl) do
 		local search = v:gsub("File%d=", ""):gsub("[\r\n].*", "")
 		if in_mpv(mpv_pls, search) then
 			remaining = remaining + 1
 			table.insert(pls_out, v)
 		end
 	end
+	footer = footer:gsub("XXX", tostring(remaining))
+	return header..table.concat(pls_out, "")..footer
 end
 
 return parser
