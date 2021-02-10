@@ -7,7 +7,7 @@
 local parser = {}
 local mpv_tbl
 
--- Check if a value is a playlist entry. v[1] is "filename" or similar, v[2] is the entry
+-- Check if a value is a playlist entry. e[1] is "filename" or similar, e[2] is the entry
 function in_mpv(val)
 	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
 		for k,v in pairs(e) do -- for key, value in index
@@ -38,7 +38,18 @@ end
 -- Create the required functions within parser
 function parser.format_pls(pls_in, mpv_pls)
 	if not pls_in == "" then
-
+		local tbl_out = {}
+		-- Create the file from scratch. Using code from in_mpv
+		for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+			for k,v in pairs(e) do -- for key, value in index
+				-- hackjob if because playing and current are non-file status entries
+				-- These are not needed and mess with the output
+				if k:lower() ~= "playing" and k:lower() ~= "current" then
+					table.insert(v)
+				end
+			end
+		end
+		return table.concat(tbl_out, "\n")
 	end
 	-- Split the entries by newlines, these can be '\r', '\n' or '\r\n'
 	local pls_tbl = {}
