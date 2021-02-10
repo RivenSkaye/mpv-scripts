@@ -179,7 +179,11 @@ function finalize(event)
 		local write_data = parser.format_pls(pls_old, mpv_pls)
 		local o = {}
 		if mp.get_property_native('options/vo-mmcss-profile', o) ~= o then
-			write_data = write_data:gsub("\n", "\r\n"):gsub("\r\r", "\r") -- Make sure all newlines are okay on Windows
+			-- Make sure all newlines are okay on Windows
+			-- Input might have \r\n, or it may have \n. So we take two steps:
+			-- Replace every \n with \r\n, this causes any \r\n to become \r\r\n
+			-- Then we replace every \r\r with \r so it's \r\n again
+			write_data = write_data:gsub("\n", "\r\n"):gsub("\r\r", "\r")
 		else
 			write_data = write_data:gsub("\r", "") -- And we might as well shave off \r otherwise
 		end
