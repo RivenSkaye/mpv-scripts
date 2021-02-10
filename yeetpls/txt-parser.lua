@@ -11,6 +11,8 @@ local mpv_tbl
 function in_mpv(val)
 	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
 		for k,v in pairs(e) do -- for key, value in index
+			-- hackjob if because playing and current are non-file status entries
+			-- These are not needed and mess with the output
 			if k:lower() ~= "playing" and k:lower() ~= "current" then
 				if val == v then
 					return true
@@ -35,6 +37,9 @@ end
 
 -- Create the required functions within parser
 function parser.format_pls(pls_in, mpv_pls)
+	if not pls_in == "" then
+
+	end
 	-- Split the entries by newlines, these can be '\r', '\n' or '\r\n'
 	local pls_tbl = {}
 	for str in pls_in:gmatch("[^\r\n]+") do -- Not sure the pipes hold any special meaning, but it works on Windows at least
