@@ -96,6 +96,7 @@ function parser.test_format(pls)
 			return false
 		end
 	end
+	return false
 end
 
 function in_mpv(mpv_tbl, search)
