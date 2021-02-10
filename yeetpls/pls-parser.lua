@@ -87,6 +87,8 @@ end
 function parser.test_format(pls)
 	local header_pass, header = verify_header(pls)
 	local content, total = split_entries(pls)
+	-- if split_entries finds illegal values, it returns false
+	if not content then return false end
 	local footer_pass, footer = verify_footer(pls, total)
 	if footer_pass and header_pass then
 		local reconstruct = header..table.concat(content, "")..footer
