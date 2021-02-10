@@ -124,6 +124,8 @@ function parser.format_pls(pls_in, mpv_pls)
 			table.insert(pls_out, v)
 		end
 	end
+	footer = footer:gsub("XXX", tostring(remaining))
+	return header..table.concat(pls_out, "")..footer
 end
 
 return parser
