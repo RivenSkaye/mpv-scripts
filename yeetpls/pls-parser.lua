@@ -120,7 +120,7 @@ function parser.format_pls(pls_in, mpv_pls)
 	local remaining = 0
 	local pls_tbl, total_in = split_entries(pls_in)
 	local pls_out = {}
-	for i,v in pls_tbl do
+	for i,v in ipairs(pls_tbl) do
 		local search = v:gsub("File%d=", ""):gsub("[\r\n].*", "")
 		if in_mpv(mpv_pls, search) then
 			remaining = remaining + 1
