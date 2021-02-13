@@ -124,7 +124,7 @@ function parser.test_format(pls)
 	-- empty string, this can only happen when createFile is true
 	if pls == "" then return true end
 	-- Checks all valid chars in file paths. Allows for periods in paths
-	local entries = split_entries(pls)
+	local entries = parser.split_entries(pls)
 	for index,entry in ipairs(entries) do
 		if not parser.test_entry(entry) then return false end
 	end

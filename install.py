@@ -23,7 +23,7 @@ from typing import Dict
 print("Welcome to Riven's interactive installer!\n")
 
 # Guess what OS is causing trouble. Again... -_-'
-windows = True if platform.system().lower() == "windows" else False
+windows = True if "windows" in platform.system().lower() else False
 def_path = None;
 newline = None
 sep = None
@@ -85,9 +85,11 @@ def install_script(data: Dict, name: str):
     for t in targets:
         scriptfile = f"{out_path}{t}"
         scriptreq = req.urlopen(url+t)
-        content = scriptreq.read().decode(scriptreq.headers.get_content_charset()).replace("\r\n", "\n")
+        content = scriptreq.read().decode(scriptreq.headers.get_content_charset()).replace("\r\n", "\n").split('\n')
+        to_file = []
         with open(scriptfile, "w+") as f:
-            f.writelines(content.split("\n")) # Make sure to have Python handle the system's newlines
+            for line in content:
+                f.write(line+newline)
     return
 
 while not select_script(filelist): pass
