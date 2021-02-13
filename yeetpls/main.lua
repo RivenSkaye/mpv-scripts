@@ -155,7 +155,6 @@ function pls_remove(event)
 	end
 	mp.commandv("playlist-remove", tostring(cur_index))
 	mpv_pls = mp.get_property_native("playlist")
-	print(#mpv_pls)
 	-- If the last file finishes playing, reason is still eof
 	-- So check if this was the last entry and if so, delete the playlist file.
 	if #mpv_pls == 0 and options.autoDeleteFile == "yes" then
@@ -167,6 +166,7 @@ mp.register_event("end-file", pls_remove)
 
 function finalize(event)
 	if pls_deleted then
+		msg.info("Finished playback, deleted '"..options.playlist.."'.")
 		-- this is only true if the last file in the playlist was played and removed
 		return
 	end
@@ -188,6 +188,7 @@ function finalize(event)
 			write_data = write_data:gsub("\r", "") -- And we might as well shave off \r otherwise
 		end
 		pls_file:write(write_data) -- It doesn't matter to mpv if there's a newline at the end
+		msg.info("Wrote the remaining "..tostring(#mpv_pls).." files to '"..options.playlist.."' for your convenience.")
 	end
 	mp.unregister_event(pls_remove)
 	mp.unregister_event(get_pls_id)
