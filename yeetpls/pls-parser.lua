@@ -124,6 +124,7 @@ function parser.format_pls(pls_in, mpv_pls)
 		local search = v:gsub("File%d=", ""):gsub("[\r\n].*", "")
 		if in_mpv(mpv_pls, search) then
 			remaining = remaining + 1
+			v:gsub("File%d=", "File"..tostring(remaining).."="):gsub("Title%d=", "Title"..tostring(remaining).."="):gsub("Length%d=", "Length"..tostring(remaining).."=") -- Change the numbers on File, Length and Title
 			table.insert(pls_out, v)
 		end
 	end
