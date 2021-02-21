@@ -26,9 +26,9 @@ end
 -- the Title and Length headers.
 function split_entries(pls_in)
 	-- retain newlines for verification at a later point in time
-	local entryfile = "File%d=.-[\r\n]+"
-	local entrytitle = "Title%d=.-[\r\n]+"
-	local entrylength = "Length%d=%-?%d+[\r\n]*" -- Final newline gets stripped in the gsub
+	local entryfile = "File%d+=.-[\r\n]+"
+	local entrytitle = "Title%d+=.-[\r\n]+"
+	local entrylength = "Length%d+=%-?%d+[\r\n]*" -- Final newline gets stripped in the gsub
 
 	-- Make a table for all entries in the file
 	local entries = {}
@@ -121,10 +121,11 @@ function parser.format_pls(pls_in, mpv_pls)
 	local pls_tbl, total_in = split_entries(pls_in)
 	local pls_out = {}
 	for i,v in ipairs(pls_tbl) do
-		local search = v:gsub("File%d=", ""):gsub("[\r\n].*", "")
+		local search = v:gsub("File%d+=", ""):gsub("[\r\n].*", "")
 		if in_mpv(mpv_pls, search) then
 			remaining = remaining + 1
-			table.insert(pls_out, v)
+			num_changed = v:gsub("File%d+=", "File"..tostring(remaining).."="):gsub("Title%d+=", "Title"..tostring(remaining).."="):gsub("Length%d+=", "Length"..tostring(remaining).."=") -- Change the numbers on File, Length and Title
+			table.insert(pls_out, num_changed)
 		end
 	end
 	footer = footer:gsub("XXX", tostring(remaining))
