@@ -79,3 +79,5 @@ function parser.format_pls(pls_in, mpv_pls)
 	end
 	return header..table.concat(pls_out, "")
 end
+
+return parser
