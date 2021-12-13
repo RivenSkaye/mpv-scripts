@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """Interactive installer for Riven's mpv scripts
 
 This interactive installer makes sure to fetch data about the available scripts
