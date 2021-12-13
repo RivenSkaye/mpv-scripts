@@ -34,7 +34,7 @@ if windows:
     sep = "\\"
 else:
     print("I've determined you're on a UNIX-like OS. Thanks for making a somewhat sane decision.")
-    def_path = f"{os.getenv('$HOME')}/.config/mpv/scripts/"
+    def_path = f"{os.getenv('HOME')}/.config/mpv/scripts/"
     sep = "/"
 
 print("Please give me a moment to fetch a list of available scripts...\n")
