@@ -71,4 +71,4 @@ This should be done by creating a branch named after the script. A few simple ru
 Feel free to fork the repo and send in a PR, or use the Issue system to notify me of bugs and missing features.
 
 ## Through Discord ##
-You can find me in various servers, or shoot me a DM. You should be able to find me pretty easily, my tag is `@Scuffed Riven#0042`.
+You can find me in various servers, or shoot me a DM. You should be able to find me pretty easily, my tag is `@Riven Skaye#0042`.
