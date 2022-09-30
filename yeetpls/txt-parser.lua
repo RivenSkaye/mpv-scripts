@@ -6,14 +6,16 @@
 
 local parser = {}
 local mpv_tbl
+local msg = require("mp.msg")
 
 -- Check if a value is a playlist entry. e[1] is "filename" or similar, e[2] is the entry
 function in_mpv(val)
-	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
-		for k,v in pairs(e) do -- for key, value in index
+	for i, e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+		for k, v in pairs(e) do -- for key, value in index
 			-- hackjob if because playing and current are non-file status entries
 			-- These are not needed and mess with the output
-			if k:lower() ~= "playing" and k:lower() ~= "current" then
+			local kl = k:lower()
+			if kl ~= "playing" and kl ~= "current" and kl ~= "id" then
 				if val == v then
 					return true
 				end
@@ -37,14 +39,15 @@ end
 
 -- Create the required functions within parser
 function parser.format_pls(pls_in, mpv_pls)
-	if pls_in ~= "" then
+	if pls_in == "" then
 		local tbl_out = {}
 		-- Create the file from scratch. Using code from in_mpv
-		for i,e in ipairs(mpv_pls) do -- for index, entry in mpv's playlist
-			for k,v in pairs(e) do -- for key, value in index
+		for i, e in ipairs(mpv_pls) do -- for index, entry in mpv's playlist
+			for k, v in pairs(e) do -- for key, value in index
 				-- hackjob if because playing and current are non-file status entries
 				-- These are not needed and mess with the output
-				if k:lower() ~= "playing" and k:lower() ~= "current" then
+				local kl = k:lower()
+				if kl ~= "playing" and kl ~= "current" and kl ~= "id" then
 					table.insert(tbl_out, v)
 				end
 			end
@@ -59,7 +62,7 @@ function parser.format_pls(pls_in, mpv_pls)
 	mpv_tbl = mpv_pls
 	-- As strings are immutable, we'll leverage table.concat instead
 	local pls_out = {}
-	for i,v in ipairs(pls_tbl) do
+	for i, v in ipairs(pls_tbl) do
 		if in_mpv(v) then
 			-- Yay, the value is still in the mpv playlist. Add it to the table
 			table.insert(pls_out, v)
@@ -70,7 +73,7 @@ function parser.format_pls(pls_in, mpv_pls)
 end
 
 -- Used in both the parser.test_format and parser.testutil functions.
-local illegal = "^%s?[^%z<>:%|%?%*\"]+[%s$]?[%.$]?" -- All chars illegal in Windows filenames. Also checks for the illegal start with whitespace and end with whitespace or periods
+local illegal = '^%s?[^%z<>:%|%?%*"]+[%s$]?[%.$]?' -- All chars illegal in Windows filenames. Also checks for the illegal start with whitespace and end with whitespace or periods
 local fwp = "^%a:[\\/][.-\\/]*.+%.%w+" -- Full Windows path
 local fnp = "/[.-/]*.+%.%w+" -- full *NIX path
 local rfp = "[%.+\\/]?[.-\\/]*.+%.%w+" -- relative file path
@@ -95,12 +98,16 @@ function parser.test_entry(entry, test)
 	}
 	local pass = true
 	-- This contains illegal file names
-	if not test == "url" and entry:find(illegal) then pass = false end
+	if not test == "url" and entry:find(illegal) then
+		pass = false
+	end
 	if not test == "url" and pass then
 		-- Check all of the requested patterns
-		for i,v in ipairs(types[pls_type]) do
+		for i, v in ipairs(types[pls_type]) do
 			-- If we find a match, return true
-			if entry:find(v) then return true end
+			if entry:find(v) then
+				return true
+			end
 		end
 		pass = false -- So far, no match. Prob illegal
 	end
@@ -122,11 +129,15 @@ end
 -- The pain of patterns drove me to this point of "fuck it". Let mpv error if a name is borked instead.
 function parser.test_format(pls)
 	-- empty string, this can only happen when createFile is true
-	if pls == "" then return true end
+	if pls == "" then
+		return true
+	end
 	-- Checks all valid chars in file paths. Allows for periods in paths
 	local entries = parser.split_entries(pls)
-	for index,entry in ipairs(entries) do
-		if not parser.test_entry(entry) then return false end
+	for index, entry in ipairs(entries) do
+		if not parser.test_entry(entry) then
+			return false
+		end
 	end
 	return true -- All entries passed the test, playlist is correct if this is true.
 end

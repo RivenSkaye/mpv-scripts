@@ -9,9 +9,10 @@ txt_base = require("txt-parser")
 parser = {}
 
 function in_mpv(mpv_tbl, search)
-	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
-		for k,v in pairs(e) do -- for key, value in index
-			if k:lower() ~= "playing" and k:lower() ~= "current" then
+	for i, e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+		for k, v in pairs(e) do -- for key, value in index
+			local kl = k:lower()
+			if kl ~= "playing" and kl ~= "current" and kl ~= "id" then
 				if search == v then
 					return true
 				end
@@ -48,11 +49,11 @@ function split_entries(pls_in)
 	end
 	for match in pls:gmatch(entrytitle) do
 		local number = tonumber(match:match("%d+"))
-		entries[number] = entries[number]..match -- This is just the seed, hence why we can't concat it yet
+		entries[number] = entries[number] .. match -- This is just the seed, hence why we can't concat it yet
 	end
 	for match in pls:gmatch(entrylength) do
 		local number = tonumber(match:match("%d+"))
-		entries[number] = entries[number]..match -- This is just the seed, hence why we can't concat it yet
+		entries[number] = entries[number] .. match -- This is just the seed, hence why we can't concat it yet
 	end
 	return entries, total_entries
 end
@@ -66,7 +67,7 @@ function verify_header(pls)
 	local header = "^%[playlist%]$"
 	local count = 0
 	local pls_lines = txt_base.split_entries(pls)
-	for _,line in ipairs(pls_lines) do
+	for _, line in ipairs(pls_lines) do
 		if line:find(header) then
 			count = count + 1
 		end
@@ -101,10 +102,12 @@ function parser.test_format(pls)
 	local header_pass, header = verify_header(pls)
 	local content, total = split_entries(pls)
 	-- if split_entries finds illegal values, it returns false
-	if not content then return false end
+	if not content then
+		return false
+	end
 	local footer_pass, footer = verify_footer(pls, total)
 	if footer_pass and header_pass then
-		local reconstruct = header..table.concat(content, "")..footer
+		local reconstruct = header .. table.concat(content, "") .. footer
 		if reconstruct == pls then -- Not stripping any legal data should mean they're equal
 			return true
 		else
@@ -120,16 +123,20 @@ function parser.format_pls(pls_in, mpv_pls)
 	local remaining = 0
 	local pls_tbl, total_in = split_entries(pls_in)
 	local pls_out = {}
-	for i,v in ipairs(pls_tbl) do
+	for i, v in ipairs(pls_tbl) do
 		local search = v:gsub("File%d+=", ""):gsub("[\r\n].*", "")
 		if in_mpv(mpv_pls, search) then
 			remaining = remaining + 1
-			num_changed = v:gsub("File%d+=", "File"..tostring(remaining).."="):gsub("Title%d+=", "Title"..tostring(remaining).."="):gsub("Length%d+=", "Length"..tostring(remaining).."=") -- Change the numbers on File, Length and Title
+			num_changed =
+				v:gsub("File%d+=", "File" .. tostring(remaining) .. "="):gsub("Title%d+=", "Title" .. tostring(remaining) .. "="):gsub(
+				"Length%d+=",
+				"Length" .. tostring(remaining) .. "="
+			) -- Change the numbers on File, Length and Title
 			table.insert(pls_out, num_changed)
 		end
 	end
 	footer = footer:gsub("XXX", tostring(remaining))
-	return header..table.concat(pls_out, "")..footer
+	return header .. table.concat(pls_out, "") .. footer
 end
 
 return parser

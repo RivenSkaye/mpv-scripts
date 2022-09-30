@@ -11,9 +11,10 @@ txt_base = require("txt-parser")
 parser = {}
 
 function in_mpv(mpv_tbl, search)
-	for i,e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
-		for k,v in pairs(e) do -- for key, value in index
-			if k:lower() ~= "playing" and k:lower() ~= "current" then
+	for i, e in ipairs(mpv_tbl) do -- for index, entry in mpv's playlist
+		for k, v in pairs(e) do -- for key, value in index
+			local kl = k:lower()
+			if kl ~= "playing" and kl ~= "current" and kl ~= "id" then
 				if search == v then
 					return true
 				end
@@ -48,15 +49,19 @@ end
 
 function parser.test_format(pls)
 	-- For creatign playlist files
-	if pls == "" then return true end
+	if pls == "" then
+		return true
+	end
 	local header_pass, header = check_for_ext(pls)
 	if not header_pass then
 		-- This isn't an Extended m3u, thus it should be a list of files
 		return txt_base.test_format(pls)
 	end
 	local content_pass, entries = split_entries(pls)
-	if not content_pass then return false end
-	local reconstruct = header..table.concat(entries, "")
+	if not content_pass then
+		return false
+	end
+	local reconstruct = header .. table.concat(entries, "")
 	if reconstruct == pls then
 		return true
 	else
@@ -67,17 +72,19 @@ end
 function parser.format_pls(pls_in, mpv_pls)
 	-- creating a file? Then we're letting the txt-parser handle it.
 	-- This makes a valid simple m3u file. I didn't make the spec, I just laugh at it.
-	if pls == "" then return txt_base.format_pls(pls_in, mpv_pls) end
+	if pls_in == "" then
+		return txt_base.format_pls(pls_in, mpv_pls)
+	end
 	local header = "#EXTM3U\n"
 	local _, pls_tbl = split_entries(pls_in)
 	local pls_out = {}
-	for i,v in ipairs(pls_tbl) do
+	for i, v in ipairs(pls_tbl) do
 		local search = v:gsub("%#EXTINF%:%-?%d+,.-[\r\n]+", ""):gsub("[\r\n]+", "")
 		if in_mpv(mpv_pls, search) then
 			table.insert(pls_out, v)
 		end
 	end
-	return header..table.concat(pls_out, "")
+	return header .. table.concat(pls_out, "")
 end
 
 return parser
